@@ -13,11 +13,24 @@ export type PreTestData = {
   takenAt: string;
 };
 
+export type QuestKey = "sholat" | "belajar" | "sosial";
+
+export type DailyProgress = {
+  day: number;            // hari ke-n dalam 30 hari
+  sholat: boolean;        // bukti sajadah disetor
+  belajar: boolean;       // timer 30 menit kelar
+  sosial: boolean;        // ngobrol 5 menit kelar
+  gameUsedMinutes: number;
+  panicTaps: number;      // berapa kali pencet Astaghfirullah
+};
+
 export type PlayerState = {
   nickname: string;
   avatar: Avatar;
   consent: boolean;
   preTest?: PreTestData;
+  treeLevel: number;      // 0-30, naik tiap hari quest komplit
+  daily?: DailyProgress;
 };
 
 const KEY = "hati-tangguh:player";
