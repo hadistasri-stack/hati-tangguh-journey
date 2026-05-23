@@ -24,10 +24,13 @@ export function SplashScreen({ onDone }: Props) {
         <HeartLogo size={200} className="animate-float" />
       </div>
       <h1 className="mt-4 text-4xl font-extrabold text-foreground tracking-tight animate-fade-up" style={{ animationDelay: "0.3s" }}>
-        Hati Tangguh
+        Reset Hati
       </h1>
-      <p className="mt-2 text-sm text-foreground/70 animate-fade-up" style={{ animationDelay: "0.6s" }}>
-        Tempat aman buat cerita sama hati kamu
+      <p className="mt-2 text-xs uppercase tracking-[0.3em] text-foreground/60 animate-fade-up" style={{ animationDelay: "0.5s" }}>
+        Quest Hati · 30 Hari Hijrah
+      </p>
+      <p className="mt-3 text-sm italic text-foreground/70 animate-fade-up px-6 text-center max-w-xs" style={{ animationDelay: "0.7s" }}>
+        "Hati yang sibuk dzikir, gak sempat candu."
       </p>
     </div>
   );
