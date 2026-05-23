@@ -5,35 +5,44 @@ import { ConsentScreen } from "@/components/game/ConsentScreen";
 import { AvatarScreen } from "@/components/game/AvatarScreen";
 import { TutorialScreen } from "@/components/game/TutorialScreen";
 import { EmotionMeterScreen } from "@/components/game/EmotionMeterScreen";
-import { WorldMap } from "@/components/game/WorldMap";
-import { Level1Intro } from "@/components/game/Level1Intro";
+import { QuestDashboard } from "@/components/game/QuestDashboard";
+import { MuhasabahMalam } from "@/components/game/MuhasabahMalam";
 import { ButuhTeman } from "@/components/game/ButuhTeman";
 import { savePlayer, type Avatar, type PreTestData } from "@/lib/game-state";
 
 export const Route = createFileRoute("/")({
-  component: HatiTangguh,
+  component: ResetHati,
 });
 
-type Stage = "splash" | "consent" | "avatar" | "tutorial" | "emotion" | "map" | "level1";
+type Stage =
+  | "splash"
+  | "consent"
+  | "avatar"
+  | "tutorial"
+  | "pretest"
+  | "dashboard"
+  | "muhasabah";
 
-function HatiTangguh() {
+function ResetHati() {
   const [stage, setStage] = useState<Stage>("splash");
   const [nickname, setNickname] = useState("");
   const [avatar, setAvatar] = useState<Avatar>("boy-1");
+  const [treeLevel, setTreeLevel] = useState(0);
 
-  // Tombol "Butuh Teman" muncul setelah tutorial dikenalin
-  const showSOS = stage === "emotion" || stage === "map" || stage === "level1";
+  // Tombol "Astaghfirullah" muncul setelah tutorial dikenalin
+  const showPanic =
+    stage === "pretest" || stage === "dashboard" || stage === "muhasabah";
 
   return (
     <>
-      {showSOS && <ButuhTeman />}
+      {showPanic && <ButuhTeman />}
 
       {stage === "splash" && <SplashScreen onDone={() => setStage("consent")} />}
 
       {stage === "consent" && (
         <ConsentScreen
           onAgree={() => {
-            savePlayer({ consent: true });
+            savePlayer({ consent: true, treeLevel: 0 });
             setStage("avatar");
           }}
         />
@@ -51,29 +60,38 @@ function HatiTangguh() {
       )}
 
       {stage === "tutorial" && (
-        <TutorialScreen nickname={nickname} onDone={() => setStage("emotion")} />
+        <TutorialScreen nickname={nickname} onDone={() => setStage("pretest")} />
       )}
 
-      {stage === "emotion" && (
+      {stage === "pretest" && (
         <EmotionMeterScreen
           nickname={nickname}
           onDone={(data: PreTestData) => {
             savePlayer({ preTest: data });
-            setStage("map");
+            setStage("dashboard");
           }}
         />
       )}
 
-      {stage === "map" && (
-        <WorldMap
+      {stage === "dashboard" && (
+        <QuestDashboard
           nickname={nickname}
           avatar={avatar}
-          onEnterLevel1={() => setStage("level1")}
+          treeLevel={treeLevel}
+          onMuhasabah={() => setStage("muhasabah")}
         />
       )}
 
-      {stage === "level1" && (
-        <Level1Intro nickname={nickname} onBack={() => setStage("map")} />
+      {stage === "muhasabah" && (
+        <MuhasabahMalam
+          nickname={nickname}
+          onDone={() => {
+            setTreeLevel((l) => Math.min(30, l + 1));
+            savePlayer({ treeLevel: Math.min(30, treeLevel + 1) });
+            setStage("dashboard");
+          }}
+          onBack={() => setStage("dashboard")}
+        />
       )}
     </>
   );
