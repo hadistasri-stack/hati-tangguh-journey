@@ -34,7 +34,7 @@ export const Route = createRootRoute({
       { name: "author", content: "Reset Hati" },
       { name: "theme-color", content: "#f4c79a" },
       { property: "og:title", content: "Reset Hati — Quest Hati" },
-      { property: "og:description", content: "Hati yang sibuk dzikir, gak sempat candu. Program 30 hari hijrah dari kecanduan game." },
+      { property: "og:description", content: "Hati yang sibuk dzikir, gak sempat candu. Program 7 hari hijrah dari kecanduan game." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

@@ -16,7 +16,7 @@ export type PreTestData = {
 export type QuestKey = "sholat" | "belajar" | "sosial";
 
 export type DailyProgress = {
-  day: number;            // hari ke-n dalam 30 hari
+  day: number;            // hari ke-n dalam 7 hari
   sholat: boolean;        // bukti sajadah disetor
   belajar: boolean;       // timer 30 menit kelar
   sosial: boolean;        // ngobrol 5 menit kelar
