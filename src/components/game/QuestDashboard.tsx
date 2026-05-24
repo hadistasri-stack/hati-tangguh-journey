@@ -12,6 +12,8 @@ type Props = {
   onMuhasabah: () => void;
 };
 
+const CYCLE_DAYS = 7;
+
 // Tahap inti: Quest Dashboard Harian — 3 quest + pohon iman + unlock game
 export function QuestDashboard({ nickname, avatar, treeLevel, onMuhasabah }: Props) {
   const [daily, setDaily] = useState<DailyProgress>({
@@ -91,7 +93,7 @@ export function QuestDashboard({ nickname, avatar, treeLevel, onMuhasabah }: Pro
         <div className="bg-card rounded-3xl shadow-soft p-5 flex items-center gap-4 animate-fade-up">
           <AvatarIcon avatar={avatar} size={56} />
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-muted-foreground">Hari ke-{daily.day} dari 30</p>
+            <p className="text-xs text-muted-foreground">Hari ke-{daily.day} dari {CYCLE_DAYS}</p>
             <p className="text-lg font-extrabold text-foreground truncate">Assalamualaikum, {nickname}</p>
           </div>
           <div className="text-right">
@@ -102,10 +104,10 @@ export function QuestDashboard({ nickname, avatar, treeLevel, onMuhasabah }: Pro
 
         {/* Pohon Iman */}
         <div className="bg-card/85 backdrop-blur rounded-3xl shadow-card p-5 flex flex-col sm:flex-row items-center gap-4 animate-fade-up" style={{ animationDelay: "0.1s" }}>
-          <PohonIman level={treeLevel + completed} size={150} className="shrink-0" />
+          <PohonIman level={treeLevel + completed} max={CYCLE_DAYS} size={150} className="shrink-0" />
           <div className="flex-1 text-center sm:text-left">
             <p className="text-xs uppercase tracking-wider text-muted-foreground">Pohon Iman</p>
-            <p className="text-xl font-extrabold text-foreground">Level {treeLevel + completed} / 30</p>
+            <p className="text-xl font-extrabold text-foreground">Level {treeLevel + completed} / {CYCLE_DAYS}</p>
             <p className="mt-1 text-sm text-foreground/75 leading-relaxed">
               "Hatimu butuh disiram pelan-pelan. Pohonnya tumbuh kalau kamu rawat — bukan dipaksa." 🌱
             </p>
@@ -250,7 +252,7 @@ export function QuestDashboard({ nickname, avatar, treeLevel, onMuhasabah }: Pro
         </div>
 
         <p className="text-center text-xs text-muted-foreground pt-2">
-          🌿 Tidak ada ranking · Privasi anak dijaga · 30 hari = 1 cycle hijrah
+          🌿 Tidak ada ranking · Privasi anak dijaga · {CYCLE_DAYS} hari = 1 cycle hijrah
         </p>
       </div>
     </div>

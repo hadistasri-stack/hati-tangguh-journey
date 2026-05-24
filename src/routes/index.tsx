@@ -86,8 +86,8 @@ function ResetHati() {
         <MuhasabahMalam
           nickname={nickname}
           onDone={() => {
-            setTreeLevel((l) => Math.min(30, l + 1));
-            savePlayer({ treeLevel: Math.min(30, treeLevel + 1) });
+            setTreeLevel((l) => Math.min(7, l + 1));
+            savePlayer({ treeLevel: Math.min(7, treeLevel + 1) });
             setStage("dashboard");
           }}
           onBack={() => setStage("dashboard")}
