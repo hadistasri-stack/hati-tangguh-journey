@@ -1,12 +1,13 @@
-type Props = { level: number; size?: number; className?: string };
+type Props = { level: number; size?: number; className?: string; max?: number };
 
-// Pohon Iman — tumbuh seiring quest harian terkumpul (0-30)
-export function PohonIman({ level, size = 180, className }: Props) {
-  const clamped = Math.max(0, Math.min(30, level));
-  // 0 = benih, 30 = pohon rimbun
-  const trunkH = 10 + clamped * 2.5;       // 10 -> 85
-  const canopyR = 8 + clamped * 1.8;       // 8  -> 62
-  const leaves = Math.min(6, Math.floor(clamped / 5));
+// Pohon Iman — tumbuh seiring quest harian terkumpul (default 0-7)
+export function PohonIman({ level, size = 180, className, max = 7 }: Props) {
+  const clamped = Math.max(0, Math.min(max, level));
+  const ratio = max > 0 ? clamped / max : 0;
+  // 0 = benih, max = pohon rimbun
+  const trunkH = 10 + ratio * 75;          // 10 -> 85
+  const canopyR = 8 + ratio * 54;          // 8  -> 62
+  const leaves = Math.min(6, Math.floor(ratio * 6));
 
   return (
     <svg width={size} height={size} viewBox="0 0 200 200" className={className} aria-label={`Pohon Iman level ${clamped}`}>
@@ -26,7 +27,7 @@ export function PohonIman({ level, size = 180, className }: Props) {
       <rect
         x={98}
         y={170 - trunkH}
-        width={4 + clamped * 0.15}
+        width={4 + ratio * 4.5}
         height={trunkH}
         rx={2}
         fill="#6b4a2b"
