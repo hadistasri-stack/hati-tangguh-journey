@@ -31,7 +31,7 @@ export function ConsentScreen({ onAgree }: Props) {
           {[
             { k: "pantau" as const, emoji: "👥", text: "Aku siap dipantau ortu/guru BK lewat akun pendamping." },
             { k: "jujur" as const, emoji: "🤲", text: "Aku mau jujur sama diri sendiri — gak nipu sistem." },
-            { k: "coba" as const, emoji: "🌱", text: "Aku mau coba 30 hari. Boleh capek, boleh istirahat — tapi gak nyerah." },
+            { k: "coba" as const, emoji: "🌱", text: "Aku mau coba 7 hari. Boleh capek, boleh istirahat — tapi gak nyerah." },
           ].map((item) => (
             <label key={item.k} className="flex items-start gap-3 cursor-pointer select-none rounded-2xl bg-warmth/50 p-3 border border-border">
               <input
