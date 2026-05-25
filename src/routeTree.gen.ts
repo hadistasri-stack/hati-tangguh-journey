@@ -14,6 +14,7 @@ import { Route as PendampingRouteImport } from './routes/pendamping'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PendampingChildIdRouteImport } from './routes/pendamping.$childId'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -40,42 +41,69 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PendampingChildIdRoute = PendampingChildIdRouteImport.update({
+  id: '/$childId',
+  path: '/$childId',
+  getParentRoute: () => PendampingRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/pendamping': typeof PendampingRoute
+  '/pendamping': typeof PendampingRouteWithChildren
   '/signup': typeof SignupRoute
+  '/pendamping/$childId': typeof PendampingChildIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/pendamping': typeof PendampingRoute
+  '/pendamping': typeof PendampingRouteWithChildren
   '/signup': typeof SignupRoute
+  '/pendamping/$childId': typeof PendampingChildIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/pendamping': typeof PendampingRoute
+  '/pendamping': typeof PendampingRouteWithChildren
   '/signup': typeof SignupRoute
+  '/pendamping/$childId': typeof PendampingChildIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/login' | '/pendamping' | '/signup'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/pendamping'
+    | '/signup'
+    | '/pendamping/$childId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login' | '/pendamping' | '/signup'
-  id: '__root__' | '/' | '/dashboard' | '/login' | '/pendamping' | '/signup'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/pendamping'
+    | '/signup'
+    | '/pendamping/$childId'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/pendamping'
+    | '/signup'
+    | '/pendamping/$childId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
-  PendampingRoute: typeof PendampingRoute
+  PendampingRoute: typeof PendampingRouteWithChildren
   SignupRoute: typeof SignupRoute
 }
 
@@ -116,14 +144,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pendamping/$childId': {
+      id: '/pendamping/$childId'
+      path: '/$childId'
+      fullPath: '/pendamping/$childId'
+      preLoaderRoute: typeof PendampingChildIdRouteImport
+      parentRoute: typeof PendampingRoute
+    }
   }
 }
+
+interface PendampingRouteChildren {
+  PendampingChildIdRoute: typeof PendampingChildIdRoute
+}
+
+const PendampingRouteChildren: PendampingRouteChildren = {
+  PendampingChildIdRoute: PendampingChildIdRoute,
+}
+
+const PendampingRouteWithChildren = PendampingRoute._addFileChildren(
+  PendampingRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
-  PendampingRoute: PendampingRoute,
+  PendampingRoute: PendampingRouteWithChildren,
   SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
