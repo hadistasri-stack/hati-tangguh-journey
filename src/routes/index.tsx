@@ -101,3 +101,33 @@ function ResetHati() {
     </>
   );
 }
+
+function AuthBar({ isAuthed }: { isAuthed: boolean }) {
+  return (
+    <div className="fixed top-2 right-2 z-50 flex gap-2 text-xs">
+      {isAuthed ? (
+        <>
+          <Link
+            to="/undang"
+            className="rounded-full bg-primary/90 text-primary-foreground px-3 py-1.5 font-semibold shadow hover:bg-primary"
+          >
+            👨‍👩‍👧 Hubungkan Pendamping
+          </Link>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="rounded-full bg-background/80 backdrop-blur px-3 py-1.5 border hover:bg-accent"
+          >
+            Keluar
+          </button>
+        </>
+      ) : (
+        <Link
+          to="/login"
+          className="rounded-full bg-background/80 backdrop-blur px-3 py-1.5 border font-medium hover:bg-accent"
+        >
+          Masuk / Daftar
+        </Link>
+      )}
+    </div>
+  );
+}
