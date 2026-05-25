@@ -14,16 +14,240 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      daily_progress: {
+        Row: {
+          belajar: boolean
+          child_id: string
+          created_at: string
+          day_index: number
+          game_used_minutes: number
+          id: string
+          log_date: string
+          panic_taps: number
+          sholat: boolean
+          sosial: boolean
+          updated_at: string
+        }
+        Insert: {
+          belajar?: boolean
+          child_id: string
+          created_at?: string
+          day_index: number
+          game_used_minutes?: number
+          id?: string
+          log_date?: string
+          panic_taps?: number
+          sholat?: boolean
+          sosial?: boolean
+          updated_at?: string
+        }
+        Update: {
+          belajar?: boolean
+          child_id?: string
+          created_at?: string
+          day_index?: number
+          game_used_minutes?: number
+          id?: string
+          log_date?: string
+          panic_taps?: number
+          sholat?: boolean
+          sosial?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      emotion_logs: {
+        Row: {
+          child_id: string
+          created_at: string
+          entries: Json
+          id: string
+          kind: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          entries: Json
+          id?: string
+          kind?: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          entries?: Json
+          id?: string
+          kind?: string
+        }
+        Relationships: []
+      }
+      invites: {
+        Row: {
+          accepted_at: string | null
+          child_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          invitee_email: string
+          invitee_role: Database["public"]["Enums"]["app_role"]
+          status: Database["public"]["Enums"]["invite_status"]
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          child_id: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invitee_email: string
+          invitee_role: Database["public"]["Enums"]["app_role"]
+          status?: Database["public"]["Enums"]["invite_status"]
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          child_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invitee_email?: string
+          invitee_role?: Database["public"]["Enums"]["app_role"]
+          status?: Database["public"]["Enums"]["invite_status"]
+          token?: string
+        }
+        Relationships: []
+      }
+      muhasabah_entries: {
+        Row: {
+          answers: Json
+          child_id: string
+          created_at: string
+          id: string
+          log_date: string
+        }
+        Insert: {
+          answers: Json
+          child_id: string
+          created_at?: string
+          id?: string
+          log_date?: string
+        }
+        Update: {
+          answers?: Json
+          child_id?: string
+          created_at?: string
+          id?: string
+          log_date?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar: string
+          created_at: string
+          email: string | null
+          id: string
+          nickname: string
+          updated_at: string
+        }
+        Insert: {
+          avatar?: string
+          created_at?: string
+          email?: string | null
+          id: string
+          nickname?: string
+          updated_at?: string
+        }
+        Update: {
+          avatar?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          nickname?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      relationships: {
+        Row: {
+          child_id: string
+          created_at: string
+          id: string
+          parent_id: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          id?: string
+          parent_id: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          id?: string
+          parent_id?: string
+        }
+        Relationships: []
+      }
+      tree_state: {
+        Row: {
+          child_id: string
+          level: number
+          updated_at: string
+        }
+        Insert: {
+          child_id: string
+          level?: number
+          updated_at?: string
+        }
+        Update: {
+          child_id?: string
+          level?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_pendamping_of: {
+        Args: { _child_id: string; _parent_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "child" | "parent" | "counselor"
+      emotion_key: "takut" | "marah" | "sedih" | "bingung" | "tenang"
+      invite_status: "pending" | "accepted" | "revoked" | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +374,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["child", "parent", "counselor"],
+      emotion_key: ["takut", "marah", "sedih", "bingung", "tenang"],
+      invite_status: ["pending", "accepted", "revoked", "expired"],
+    },
   },
 } as const
