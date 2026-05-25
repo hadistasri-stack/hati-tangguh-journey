@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { SplashScreen } from "@/components/game/SplashScreen";
 import { ConsentScreen } from "@/components/game/ConsentScreen";
@@ -9,6 +10,8 @@ import { QuestDashboard } from "@/components/game/QuestDashboard";
 import { MuhasabahMalam } from "@/components/game/MuhasabahMalam";
 import { ButuhTeman } from "@/components/game/ButuhTeman";
 import { savePlayer, type Avatar, type PreTestData } from "@/lib/game-state";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   component: ResetHati,
@@ -28,6 +31,7 @@ function ResetHati() {
   const [nickname, setNickname] = useState("");
   const [avatar, setAvatar] = useState<Avatar>("boy-1");
   const [treeLevel, setTreeLevel] = useState(0);
+  const { session } = useAuth();
 
   // Tombol "Astaghfirullah" muncul setelah tutorial dikenalin
   const showPanic =
@@ -35,6 +39,7 @@ function ResetHati() {
 
   return (
     <>
+      <AuthBar isAuthed={!!session} />
       {showPanic && <ButuhTeman />}
 
       {stage === "splash" && <SplashScreen onDone={() => setStage("consent")} />}
@@ -94,5 +99,35 @@ function ResetHati() {
         />
       )}
     </>
+  );
+}
+
+function AuthBar({ isAuthed }: { isAuthed: boolean }) {
+  return (
+    <div className="fixed top-2 right-2 z-50 flex gap-2 text-xs">
+      {isAuthed ? (
+        <>
+          <Link
+            to="/undang"
+            className="rounded-full bg-primary/90 text-primary-foreground px-3 py-1.5 font-semibold shadow hover:bg-primary"
+          >
+            👨‍👩‍👧 Hubungkan Pendamping
+          </Link>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="rounded-full bg-background/80 backdrop-blur px-3 py-1.5 border hover:bg-accent"
+          >
+            Keluar
+          </button>
+        </>
+      ) : (
+        <Link
+          to="/login"
+          className="rounded-full bg-background/80 backdrop-blur px-3 py-1.5 border font-medium hover:bg-accent"
+        >
+          Masuk / Daftar
+        </Link>
+      )}
+    </div>
   );
 }
