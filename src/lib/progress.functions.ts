@@ -95,7 +95,7 @@ export const saveMuhasabah = createServerFn({ method: "POST" })
     const today = new Date().toISOString().slice(0, 10);
     const { error } = await supabase
       .from("muhasabah_entries")
-      .insert({ child_id: userId, log_date: today, answers: data.answers });
+      .insert({ child_id: userId, log_date: today, answers: data.answers as never });
     if (error) throw new Error(error.message);
 
     // Bump tree level (capped at 7)
