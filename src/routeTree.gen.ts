@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UndangRouteImport } from './routes/undang'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as PendampingRouteImport } from './routes/pendamping'
 import { Route as LoginRouteImport } from './routes/login'
@@ -16,6 +17,11 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PendampingChildIdRouteImport } from './routes/pendamping.$childId'
 
+const UndangRoute = UndangRouteImport.update({
+  id: '/undang',
+  path: '/undang',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/pendamping': typeof PendampingRouteWithChildren
   '/signup': typeof SignupRoute
+  '/undang': typeof UndangRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/pendamping': typeof PendampingRouteWithChildren
   '/signup': typeof SignupRoute
+  '/undang': typeof UndangRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
 }
 export interface FileRoutesById {
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/pendamping': typeof PendampingRouteWithChildren
   '/signup': typeof SignupRoute
+  '/undang': typeof UndangRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
 }
 export interface FileRouteTypes {
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/pendamping'
     | '/signup'
+    | '/undang'
     | '/pendamping/$childId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/pendamping'
     | '/signup'
+    | '/undang'
     | '/pendamping/$childId'
   id:
     | '__root__'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/pendamping'
     | '/signup'
+    | '/undang'
     | '/pendamping/$childId'
   fileRoutesById: FileRoutesById
 }
@@ -105,10 +117,18 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PendampingRoute: typeof PendampingRouteWithChildren
   SignupRoute: typeof SignupRoute
+  UndangRoute: typeof UndangRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/undang': {
+      id: '/undang'
+      path: '/undang'
+      fullPath: '/undang'
+      preLoaderRoute: typeof UndangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -172,6 +192,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PendampingRoute: PendampingRouteWithChildren,
   SignupRoute: SignupRoute,
+  UndangRoute: UndangRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
