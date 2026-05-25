@@ -16,6 +16,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PendampingChildIdRouteImport } from './routes/pendamping.$childId'
+import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 
 const UndangRoute = UndangRouteImport.update({
   id: '/undang',
@@ -52,6 +53,11 @@ const PendampingChildIdRoute = PendampingChildIdRouteImport.update({
   path: '/$childId',
   getParentRoute: () => PendampingRoute,
 } as any)
+const InviteTokenRoute = InviteTokenRouteImport.update({
+  id: '/invite/$token',
+  path: '/invite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/pendamping': typeof PendampingRouteWithChildren
   '/signup': typeof SignupRoute
   '/undang': typeof UndangRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/pendamping': typeof PendampingRouteWithChildren
   '/signup': typeof SignupRoute
   '/undang': typeof UndangRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/pendamping': typeof PendampingRouteWithChildren
   '/signup': typeof SignupRoute
   '/undang': typeof UndangRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/pendamping'
     | '/signup'
     | '/undang'
+    | '/invite/$token'
     | '/pendamping/$childId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/pendamping'
     | '/signup'
     | '/undang'
+    | '/invite/$token'
     | '/pendamping/$childId'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/pendamping'
     | '/signup'
     | '/undang'
+    | '/invite/$token'
     | '/pendamping/$childId'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   PendampingRoute: typeof PendampingRouteWithChildren
   SignupRoute: typeof SignupRoute
   UndangRoute: typeof UndangRoute
+  InviteTokenRoute: typeof InviteTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -171,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PendampingChildIdRouteImport
       parentRoute: typeof PendampingRoute
     }
+    '/invite/$token': {
+      id: '/invite/$token'
+      path: '/invite/$token'
+      fullPath: '/invite/$token'
+      preLoaderRoute: typeof InviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -193,6 +213,7 @@ const rootRouteChildren: RootRouteChildren = {
   PendampingRoute: PendampingRouteWithChildren,
   SignupRoute: SignupRoute,
   UndangRoute: UndangRoute,
+  InviteTokenRoute: InviteTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
