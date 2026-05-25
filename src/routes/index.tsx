@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { SplashScreen } from "@/components/game/SplashScreen";
 import { ConsentScreen } from "@/components/game/ConsentScreen";
@@ -9,6 +10,8 @@ import { QuestDashboard } from "@/components/game/QuestDashboard";
 import { MuhasabahMalam } from "@/components/game/MuhasabahMalam";
 import { ButuhTeman } from "@/components/game/ButuhTeman";
 import { savePlayer, type Avatar, type PreTestData } from "@/lib/game-state";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   component: ResetHati,
@@ -28,6 +31,7 @@ function ResetHati() {
   const [nickname, setNickname] = useState("");
   const [avatar, setAvatar] = useState<Avatar>("boy-1");
   const [treeLevel, setTreeLevel] = useState(0);
+  const { session } = useAuth();
 
   // Tombol "Astaghfirullah" muncul setelah tutorial dikenalin
   const showPanic =
@@ -35,6 +39,7 @@ function ResetHati() {
 
   return (
     <>
+      <AuthBar isAuthed={!!session} />
       {showPanic && <ButuhTeman />}
 
       {stage === "splash" && <SplashScreen onDone={() => setStage("consent")} />}
