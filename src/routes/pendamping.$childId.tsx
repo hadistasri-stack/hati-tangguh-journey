@@ -108,6 +108,65 @@ function ChildDetail() {
         </div>
 
         <Card className="p-4 mb-6">
+          <h2 className="font-semibold mb-1">Tren Emosi</h2>
+          <p className="text-xs text-muted-foreground mb-3">
+            Perbandingan rata-rata intensitas emosi saat awal (pre-test) vs catatan terbaru.
+          </p>
+          {(() => {
+            const logs = (data.emotions ?? []) as EmotionLog[];
+            const pre = logs.find((l) => l.kind === "pretest");
+            const latest = logs.length > 0 ? logs[logs.length - 1] : null;
+            if (!pre) {
+              return (
+                <p className="text-sm text-muted-foreground">
+                  Anak belum mengisi emotion meter awal.
+                </p>
+              );
+            }
+            const preAvg = avgIntensities(pre.entries);
+            const latestAvg = latest && latest.id !== pre.id ? avgIntensities(latest.entries) : null;
+            const chartData = EMOTION_KEYS.map((k) => ({
+              emotion: EMOTION_LABEL[k],
+              "Pre-test": preAvg[k] ?? 0,
+              ...(latestAvg ? { Terbaru: latestAvg[k] ?? 0 } : {}),
+            }));
+            return (
+              <>
+                <div className="h-64 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                      <XAxis dataKey="emotion" tick={{ fontSize: 12 }} />
+                      <YAxis domain={[0, 5]} tick={{ fontSize: 12 }} />
+                      <Tooltip
+                        contentStyle={{
+                          background: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: 8,
+                          fontSize: 12,
+                        }}
+                      />
+                      <Legend wrapperStyle={{ fontSize: 12 }} />
+                      <Bar dataKey="Pre-test" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} />
+                      {latestAvg && (
+                        <Bar dataKey="Terbaru" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                      )}
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="mt-2 flex justify-between text-xs text-muted-foreground">
+                  <span>Pre-test: {new Date(pre.created_at).toLocaleDateString("id-ID")}</span>
+                  {latestAvg && latest && (
+                    <span>Terbaru: {new Date(latest.created_at).toLocaleDateString("id-ID")}</span>
+                  )}
+                  {!latestAvg && <span>Belum ada catatan emosi terbaru</span>}
+                </div>
+              </>
+            );
+          })()}
+        </Card>
+
+        <Card className="p-4 mb-6">
           <h2 className="font-semibold mb-3">Riwayat 14 hari</h2>
           {data.history.length === 0 ? (
             <p className="text-sm text-muted-foreground">Belum ada catatan harian.</p>
