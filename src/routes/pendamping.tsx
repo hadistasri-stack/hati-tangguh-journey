@@ -72,7 +72,7 @@ function PendampingHome() {
             }),
             { sholat: 0, belajar: 0, sosial: 0, panic: 0 },
           );
-          const logs = (d.emotions ?? []) as Array<{
+          const logs = (d.emotions ?? []) as unknown as Array<{
             id: string; kind: string; created_at: string;
             entries: Array<{ emotion: string; intensity: number }>;
           }>;
