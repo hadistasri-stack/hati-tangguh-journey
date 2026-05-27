@@ -113,7 +113,7 @@ function ChildDetail() {
             Perbandingan rata-rata intensitas emosi saat awal (pre-test) vs catatan terbaru.
           </p>
           {(() => {
-            const logs = (data.emotions ?? []) as EmotionLog[];
+            const logs = (data.emotions ?? []) as unknown as EmotionLog[];
             const pre = logs.find((l) => l.kind === "pretest");
             const latest = logs.length > 0 ? logs[logs.length - 1] : null;
             if (!pre) {
