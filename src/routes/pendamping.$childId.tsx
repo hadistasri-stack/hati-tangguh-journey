@@ -90,6 +90,46 @@ function ChildDetail() {
           )}
         </Card>
 
+        <Card className="p-4 mb-6">
+          <h2 className="font-semibold mb-1">Panic Alerts</h2>
+          <p className="text-xs text-muted-foreground mb-3">
+            Hari-hari saat anak menekan tombol "Astaghfirullah" — pola ini bisa jadi sinyal craving.
+          </p>
+          {(() => {
+            const panicDays = data.history.filter((h) => (h.panic_taps ?? 0) > 0);
+            if (panicDays.length === 0) {
+              return <p className="text-sm text-muted-foreground">Belum ada tap panic dalam 14 hari terakhir. ✨</p>;
+            }
+            return (
+              <div className="space-y-2">
+                {panicDays.map((h) => {
+                  const taps = h.panic_taps ?? 0;
+                  const high = taps >= 3;
+                  return (
+                    <div
+                      key={h.id}
+                      className={`flex items-center justify-between rounded-lg border p-3 text-sm ${
+                        high ? "border-destructive/40 bg-destructive/5" : "border-border"
+                      }`}
+                    >
+                      <div>
+                        <p className="font-mono text-xs text-muted-foreground">{h.log_date}</p>
+                        {high && (
+                          <p className="text-xs text-destructive mt-0.5">⚠ Sering panik hari ini</p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold">{taps}×</p>
+                        <p className="text-xs text-muted-foreground">tap</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
+        </Card>
+
         <Card className="p-4 bg-muted/40">
           <p className="text-xs text-muted-foreground">
             🔒 Catatan muhasabah anak bersifat privat dan tidak ditampilkan di sini.
