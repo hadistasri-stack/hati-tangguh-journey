@@ -129,12 +129,22 @@ function PendampingHome() {
         }
         return EMO.map((k) => (counts[k] ? +(sums[k] / counts[k]).toFixed(2) : 0));
       };
+      // Daftar intensitas per emosi, dipisah ";" agar tetap aman di 1 kolom CSV
+      const perEmotionList = (entries: Array<{ emotion: string; intensity: number }> | null | undefined) => {
+        const buckets: Record<string, number[]> = {};
+        for (const e of entries ?? []) {
+          (buckets[e.emotion] ??= []).push(e.intensity);
+        }
+        return EMO.map((k) => (buckets[k]?.length ? buckets[k].join(";") : ""));
+      };
 
       const headers = [
         "nickname", "email", "tree_level",
         "hari_tercatat_14d", "total_sholat", "total_belajar", "total_sosial", "total_panic_taps",
         ...EMO.map((e) => `pretest_${e}`),
+        ...EMO.map((e) => `pretest_${e}_entries`),
         ...EMO.map((e) => `terbaru_${e}`),
+        ...EMO.map((e) => `terbaru_${e}_entries`),
         "tanggal_pretest", "tanggal_terbaru",
       ];
       const escape = (v: unknown) => {
@@ -171,6 +181,8 @@ function PendampingHome() {
           const latest = logsInRange.length > 0 ? logsInRange[logsInRange.length - 1] : null;
           const preAvg = pre ? avg(pre.entries) : EMO.map(() => "");
           const latestAvg = latest && (!pre || latest.id !== pre.id) ? avg(latest.entries) : EMO.map(() => "");
+          const preList = pre ? perEmotionList(pre.entries) : EMO.map(() => "");
+          const latestList = latest && (!pre || latest.id !== pre.id) ? perEmotionList(latest.entries) : EMO.map(() => "");
           rows.push([
             r.other?.nickname ?? "",
             r.other?.email ?? "",
@@ -178,7 +190,9 @@ function PendampingHome() {
             historyInRange.length,
             totals.sholat, totals.belajar, totals.sosial, totals.panic,
             ...preAvg,
+            ...preList,
             ...latestAvg,
+            ...latestList,
             pre ? new Date(pre.created_at).toISOString().slice(0, 10) : "",
             latest && (!pre || latest.id !== pre.id) ? new Date(latest.created_at).toISOString().slice(0, 10) : "",
           ].map(escape).join(","));
