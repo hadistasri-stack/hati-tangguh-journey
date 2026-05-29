@@ -9,6 +9,14 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/pendamping")({
   component: PendampingHome,
@@ -24,6 +32,18 @@ function PendampingHome() {
   const defaultFrom = new Date(Date.now() - 13 * 86400000).toISOString().slice(0, 10);
   const [fromDate, setFromDate] = useState(defaultFrom);
   const [toDate, setToDate] = useState(today);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  type PreviewRow = {
+    childId: string;
+    nickname: string;
+    email: string;
+    historyCount: number;
+    hasPretest: boolean;
+    hasLatest: boolean;
+    error?: boolean;
+  };
+  const [preview, setPreview] = useState<PreviewRow[] | null>(null);
   const { data: rels, isLoading } = useQuery({
     queryKey: ["my-relationships"],
     queryFn: () => fetchRels(),
@@ -37,6 +57,59 @@ function PendampingHome() {
   if (loading || isLoading) {
     return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Memuat…</div>;
   }
+
+  const openPreview = async () => {
+    if (!rels || rels.length === 0) return;
+    if (fromDate && toDate && fromDate > toDate) {
+      alert("Tanggal mulai harus sebelum tanggal akhir");
+      return;
+    }
+    setPreviewOpen(true);
+    setPreviewLoading(true);
+    setPreview(null);
+    try {
+      const rows: PreviewRow[] = [];
+      for (const r of rels) {
+        try {
+          const d = await fetchChild({ data: { childId: r.child_id } });
+          const historyInRange = d.history.filter((h) => {
+            const dt = h.log_date;
+            return (!fromDate || dt >= fromDate) && (!toDate || dt <= toDate);
+          });
+          const logs = (d.emotions ?? []) as unknown as Array<{
+            id: string; kind: string; created_at: string;
+          }>;
+          const logsInRange = logs.filter((l) => {
+            const dt = l.created_at.slice(0, 10);
+            return (!fromDate || dt >= fromDate) && (!toDate || dt <= toDate);
+          });
+          const pre = logsInRange.find((l) => l.kind === "pretest") ?? logs.find((l) => l.kind === "pretest");
+          const latest = logsInRange.length > 0 ? logsInRange[logsInRange.length - 1] : null;
+          rows.push({
+            childId: r.child_id,
+            nickname: r.other?.nickname ?? "Anak",
+            email: r.other?.email ?? "",
+            historyCount: historyInRange.length,
+            hasPretest: !!pre,
+            hasLatest: !!(latest && (!pre || latest.id !== pre.id)),
+          });
+        } catch {
+          rows.push({
+            childId: r.child_id,
+            nickname: r.other?.nickname ?? "Anak",
+            email: r.other?.email ?? "",
+            historyCount: 0,
+            hasPretest: false,
+            hasLatest: false,
+            error: true,
+          });
+        }
+      }
+      setPreview(rows);
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
 
   const exportCsv = async () => {
     if (!rels || rels.length === 0) return;
@@ -124,6 +197,7 @@ function PendampingHome() {
       URL.revokeObjectURL(url);
     } finally {
       setExporting(false);
+      setPreviewOpen(false);
     }
   };
 
@@ -168,7 +242,7 @@ function PendampingHome() {
             </div>
             <Button
               variant="secondary"
-              onClick={exportCsv}
+              onClick={openPreview}
               disabled={exporting}
               className="sm:w-auto w-full"
             >
@@ -207,6 +281,91 @@ function PendampingHome() {
           </div>
         )}
       </div>
+
+      <Dialog open={previewOpen} onOpenChange={(o) => !exporting && setPreviewOpen(o)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Ringkasan sebelum export</DialogTitle>
+            <DialogDescription>
+              Periode {fromDate} s/d {toDate}
+            </DialogDescription>
+          </DialogHeader>
+
+          {previewLoading || !preview ? (
+            <p className="text-sm text-muted-foreground py-6 text-center">Menghitung ringkasan…</p>
+          ) : (
+            (() => {
+              const total = preview.length;
+              const emptyHistory = preview.filter((p) => p.historyCount === 0 && !p.error);
+              const noPretest = preview.filter((p) => !p.hasPretest && !p.error);
+              const errored = preview.filter((p) => p.error);
+              const fullyEmpty = preview.filter(
+                (p) => !p.error && p.historyCount === 0 && !p.hasPretest && !p.hasLatest,
+              );
+              return (
+                <div className="space-y-3 text-sm">
+                  <p>
+                    Akan mengekspor <strong>{total}</strong> anak dalam rentang tanggal terpilih.
+                  </p>
+                  {(emptyHistory.length > 0 || noPretest.length > 0 || errored.length > 0) && (
+                    <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 space-y-1">
+                      <p className="font-medium text-destructive">Peringatan data kosong</p>
+                      <ul className="list-disc pl-5 text-muted-foreground space-y-0.5">
+                        {fullyEmpty.length > 0 && (
+                          <li><strong>{fullyEmpty.length}</strong> anak tanpa data apa pun di periode ini</li>
+                        )}
+                        {emptyHistory.length > 0 && (
+                          <li><strong>{emptyHistory.length}</strong> anak tanpa catatan harian</li>
+                        )}
+                        {noPretest.length > 0 && (
+                          <li><strong>{noPretest.length}</strong> anak belum punya pre-test emosi</li>
+                        )}
+                        {errored.length > 0 && (
+                          <li><strong>{errored.length}</strong> anak gagal dimuat datanya</li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+                  <div className="max-h-56 overflow-auto rounded-md border">
+                    <table className="w-full text-xs">
+                      <thead className="bg-muted/50 sticky top-0">
+                        <tr>
+                          <th className="text-left p-2">Anak</th>
+                          <th className="text-right p-2">Hari</th>
+                          <th className="text-center p-2">Pretest</th>
+                          <th className="text-center p-2">Terbaru</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {preview.map((p) => (
+                          <tr key={p.childId} className="border-t">
+                            <td className="p-2">
+                              {p.nickname}
+                              {p.error && <span className="text-destructive"> (error)</span>}
+                            </td>
+                            <td className="p-2 text-right">{p.historyCount}</td>
+                            <td className="p-2 text-center">{p.hasPretest ? "✓" : "—"}</td>
+                            <td className="p-2 text-center">{p.hasLatest ? "✓" : "—"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })()
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPreviewOpen(false)} disabled={exporting}>
+              Batal
+            </Button>
+            <Button onClick={exportCsv} disabled={exporting || previewLoading || !preview}>
+              {exporting ? "Mengekspor…" : "Lanjut export CSV"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
