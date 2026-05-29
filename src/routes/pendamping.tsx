@@ -32,16 +32,20 @@ function PendampingHome() {
   const defaultFrom = new Date(Date.now() - 13 * 86400000).toISOString().slice(0, 10);
   const [fromDate, setFromDate] = useState(defaultFrom);
   const [toDate, setToDate] = useState(today);
+  const [minLevel, setMinLevel] = useState<number>(0);
+  const [maxLevel, setMaxLevel] = useState<number>(7);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
   type PreviewRow = {
     childId: string;
     nickname: string;
     email: string;
+    treeLevel: number;
     historyCount: number;
     hasPretest: boolean;
     hasLatest: boolean;
     error?: boolean;
+    skipped?: boolean;
   };
   const [preview, setPreview] = useState<PreviewRow[] | null>(null);
   const { data: rels, isLoading } = useQuery({
@@ -64,6 +68,10 @@ function PendampingHome() {
       alert("Tanggal mulai harus sebelum tanggal akhir");
       return;
     }
+    if (minLevel > maxLevel) {
+      alert("Level minimum harus ≤ level maksimum");
+      return;
+    }
     setPreviewOpen(true);
     setPreviewLoading(true);
     setPreview(null);
@@ -72,6 +80,8 @@ function PendampingHome() {
       for (const r of rels) {
         try {
           const d = await fetchChild({ data: { childId: r.child_id } });
+          const level = d.tree?.level ?? 0;
+          const inLevel = level >= minLevel && level <= maxLevel;
           const historyInRange = d.history.filter((h) => {
             const dt = h.log_date;
             return (!fromDate || dt >= fromDate) && (!toDate || dt <= toDate);
@@ -89,15 +99,18 @@ function PendampingHome() {
             childId: r.child_id,
             nickname: r.other?.nickname ?? "Anak",
             email: r.other?.email ?? "",
+            treeLevel: level,
             historyCount: historyInRange.length,
             hasPretest: !!pre,
             hasLatest: !!(latest && (!pre || latest.id !== pre.id)),
+            skipped: !inLevel,
           });
         } catch {
           rows.push({
             childId: r.child_id,
             nickname: r.other?.nickname ?? "Anak",
             email: r.other?.email ?? "",
+            treeLevel: 0,
             historyCount: 0,
             hasPretest: false,
             hasLatest: false,
@@ -115,6 +128,10 @@ function PendampingHome() {
     if (!rels || rels.length === 0) return;
     if (fromDate && toDate && fromDate > toDate) {
       alert("Tanggal mulai harus sebelum tanggal akhir");
+      return;
+    }
+    if (minLevel > maxLevel) {
+      alert("Level minimum harus ≤ level maksimum");
       return;
     }
     setExporting(true);
@@ -156,6 +173,8 @@ function PendampingHome() {
       for (const r of rels) {
         try {
           const d = await fetchChild({ data: { childId: r.child_id } });
+          const level = d.tree?.level ?? 0;
+          if (level < minLevel || level > maxLevel) continue;
           const historyInRange = d.history.filter((h) => {
             const dt = h.log_date;
             return (!fromDate || dt >= fromDate) && (!toDate || dt <= toDate);
@@ -206,7 +225,7 @@ function PendampingHome() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `ringkasan-anak_${fromDate}_${toDate}.csv`;
+      a.download = `ringkasan-anak_${fromDate}_${toDate}_lvl${minLevel}-${maxLevel}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     } finally {
@@ -252,6 +271,28 @@ function PendampingHome() {
                 min={fromDate || undefined}
                 max={today}
                 onChange={(e) => setToDate(e.target.value)}
+              />
+            </div>
+            <div className="w-24">
+              <Label htmlFor="min-level" className="text-xs">Level min</Label>
+              <Input
+                id="min-level"
+                type="number"
+                min={0}
+                max={7}
+                value={minLevel}
+                onChange={(e) => setMinLevel(Math.max(0, Math.min(7, Number(e.target.value) || 0)))}
+              />
+            </div>
+            <div className="w-24">
+              <Label htmlFor="max-level" className="text-xs">Level maks</Label>
+              <Input
+                id="max-level"
+                type="number"
+                min={0}
+                max={7}
+                value={maxLevel}
+                onChange={(e) => setMaxLevel(Math.max(0, Math.min(7, Number(e.target.value) || 0)))}
               />
             </div>
             <Button
@@ -309,17 +350,23 @@ function PendampingHome() {
             <p className="text-sm text-muted-foreground py-6 text-center">Menghitung ringkasan…</p>
           ) : (
             (() => {
-              const total = preview.length;
-              const emptyHistory = preview.filter((p) => p.historyCount === 0 && !p.error);
-              const noPretest = preview.filter((p) => !p.hasPretest && !p.error);
+              const included = preview.filter((p) => !p.skipped && !p.error);
+              const skipped = preview.filter((p) => p.skipped);
+              const total = included.length;
+              const emptyHistory = included.filter((p) => p.historyCount === 0);
+              const noPretest = included.filter((p) => !p.hasPretest);
               const errored = preview.filter((p) => p.error);
-              const fullyEmpty = preview.filter(
-                (p) => !p.error && p.historyCount === 0 && !p.hasPretest && !p.hasLatest,
+              const fullyEmpty = included.filter(
+                (p) => p.historyCount === 0 && !p.hasPretest && !p.hasLatest,
               );
               return (
                 <div className="space-y-3 text-sm">
                   <p>
-                    Akan mengekspor <strong>{total}</strong> anak dalam rentang tanggal terpilih.
+                    Akan mengekspor <strong>{total}</strong> anak (level {minLevel}–{maxLevel})
+                    {skipped.length > 0 && (
+                      <> · <span className="text-muted-foreground">{skipped.length} dilewati karena di luar level</span></>
+                    )}
+                    .
                   </p>
                   {(emptyHistory.length > 0 || noPretest.length > 0 || errored.length > 0) && (
                     <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 space-y-1">
@@ -345,6 +392,7 @@ function PendampingHome() {
                       <thead className="bg-muted/50 sticky top-0">
                         <tr>
                           <th className="text-left p-2">Anak</th>
+                          <th className="text-center p-2">Lvl</th>
                           <th className="text-right p-2">Hari</th>
                           <th className="text-center p-2">Pretest</th>
                           <th className="text-center p-2">Terbaru</th>
@@ -352,11 +400,13 @@ function PendampingHome() {
                       </thead>
                       <tbody>
                         {preview.map((p) => (
-                          <tr key={p.childId} className="border-t">
+                          <tr key={p.childId} className={`border-t ${p.skipped ? "opacity-50" : ""}`}>
                             <td className="p-2">
                               {p.nickname}
                               {p.error && <span className="text-destructive"> (error)</span>}
+                              {p.skipped && <span className="text-muted-foreground"> (dilewati)</span>}
                             </td>
+                            <td className="p-2 text-center">{p.treeLevel}</td>
                             <td className="p-2 text-right">{p.historyCount}</td>
                             <td className="p-2 text-center">{p.hasPretest ? "✓" : "—"}</td>
                             <td className="p-2 text-center">{p.hasLatest ? "✓" : "—"}</td>
