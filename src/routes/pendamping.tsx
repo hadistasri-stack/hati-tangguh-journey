@@ -7,6 +7,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/pendamping")({
   component: PendampingHome,
@@ -18,6 +20,10 @@ function PendampingHome() {
   const fetchRels = useServerFn(listMyRelationships);
   const fetchChild = useServerFn(getChildDashboard);
   const [exporting, setExporting] = useState(false);
+  const today = new Date().toISOString().slice(0, 10);
+  const defaultFrom = new Date(Date.now() - 13 * 86400000).toISOString().slice(0, 10);
+  const [fromDate, setFromDate] = useState(defaultFrom);
+  const [toDate, setToDate] = useState(today);
   const { data: rels, isLoading } = useQuery({
     queryKey: ["my-relationships"],
     queryFn: () => fetchRels(),
@@ -34,6 +40,10 @@ function PendampingHome() {
 
   const exportCsv = async () => {
     if (!rels || rels.length === 0) return;
+    if (fromDate && toDate && fromDate > toDate) {
+      alert("Tanggal mulai harus sebelum tanggal akhir");
+      return;
+    }
     setExporting(true);
     try {
       const EMO = ["takut", "marah", "sedih", "bingung", "tenang"] as const;
@@ -63,7 +73,11 @@ function PendampingHome() {
       for (const r of rels) {
         try {
           const d = await fetchChild({ data: { childId: r.child_id } });
-          const totals = d.history.reduce(
+          const historyInRange = d.history.filter((h) => {
+            const dt = h.log_date;
+            return (!fromDate || dt >= fromDate) && (!toDate || dt <= toDate);
+          });
+          const totals = historyInRange.reduce(
             (acc, h) => ({
               sholat: acc.sholat + (h.sholat ? 1 : 0),
               belajar: acc.belajar + (h.belajar ? 1 : 0),
@@ -76,15 +90,19 @@ function PendampingHome() {
             id: string; kind: string; created_at: string;
             entries: Array<{ emotion: string; intensity: number }>;
           }>;
-          const pre = logs.find((l) => l.kind === "pretest");
-          const latest = logs.length > 0 ? logs[logs.length - 1] : null;
+          const logsInRange = logs.filter((l) => {
+            const dt = l.created_at.slice(0, 10);
+            return (!fromDate || dt >= fromDate) && (!toDate || dt <= toDate);
+          });
+          const pre = logsInRange.find((l) => l.kind === "pretest") ?? logs.find((l) => l.kind === "pretest");
+          const latest = logsInRange.length > 0 ? logsInRange[logsInRange.length - 1] : null;
           const preAvg = pre ? avg(pre.entries) : EMO.map(() => "");
           const latestAvg = latest && (!pre || latest.id !== pre.id) ? avg(latest.entries) : EMO.map(() => "");
           rows.push([
             r.other?.nickname ?? "",
             r.other?.email ?? "",
             d.tree?.level ?? 0,
-            d.history.length,
+            historyInRange.length,
             totals.sholat, totals.belajar, totals.sosial, totals.panic,
             ...preAvg,
             ...latestAvg,
@@ -101,7 +119,7 @@ function PendampingHome() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `ringkasan-anak-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.download = `ringkasan-anak_${fromDate}_${toDate}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     } finally {
@@ -118,22 +136,46 @@ function PendampingHome() {
             <p className="text-sm text-muted-foreground">Pantau progres hijrah anak/siswa-mu</p>
           </div>
           <div className="flex gap-2">
-            {rels && rels.length > 0 && (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={exportCsv}
-                disabled={exporting}
-              >
-                {exporting ? "Mengekspor…" : "Export CSV"}
-              </Button>
-            )}
             <Button variant="outline" size="sm" onClick={async () => {
               await supabase.auth.signOut();
               navigate({ to: "/login" });
             }}>Keluar</Button>
           </div>
         </header>
+
+        {rels && rels.length > 0 && (
+          <Card className="p-4 mb-4 flex flex-col sm:flex-row sm:items-end gap-3">
+            <div className="flex-1">
+              <Label htmlFor="from-date" className="text-xs">Dari tanggal</Label>
+              <Input
+                id="from-date"
+                type="date"
+                value={fromDate}
+                max={toDate || undefined}
+                onChange={(e) => setFromDate(e.target.value)}
+              />
+            </div>
+            <div className="flex-1">
+              <Label htmlFor="to-date" className="text-xs">Sampai tanggal</Label>
+              <Input
+                id="to-date"
+                type="date"
+                value={toDate}
+                min={fromDate || undefined}
+                max={today}
+                onChange={(e) => setToDate(e.target.value)}
+              />
+            </div>
+            <Button
+              variant="secondary"
+              onClick={exportCsv}
+              disabled={exporting}
+              className="sm:w-auto w-full"
+            >
+              {exporting ? "Mengekspor…" : "Export CSV"}
+            </Button>
+          </Card>
+        )}
 
         {(!rels || rels.length === 0) ? (
           <Card className="p-8 text-center">
