@@ -9,10 +9,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RoleGate } from "@/components/RoleGate";
 
 export const Route = createFileRoute("/undang")({
-  component: UndangPage,
+  component: GatedUndangPage,
 });
+
+function GatedUndangPage() {
+  return (
+    <RoleGate allow={["child"]}>
+      <UndangPage />
+    </RoleGate>
+  );
+}
 
 function UndangPage() {
   const { session, loading } = useAuth();

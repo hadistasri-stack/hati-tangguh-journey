@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RoleGate } from "@/components/RoleGate";
 import {
   Dialog,
   DialogContent,
@@ -19,8 +20,16 @@ import {
 } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/pendamping")({
-  component: PendampingHome,
+  component: GatedPendampingHome,
 });
+
+function GatedPendampingHome() {
+  return (
+    <RoleGate allow={["parent", "counselor"]}>
+      <PendampingHome />
+    </RoleGate>
+  );
+}
 
 function PendampingHome() {
   const { session, loading } = useAuth();
