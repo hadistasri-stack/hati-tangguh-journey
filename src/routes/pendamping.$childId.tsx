@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getChildDashboard } from "@/lib/invites.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
+import { RoleGate } from "@/components/RoleGate";
 import {
   ResponsiveContainer,
   BarChart,
@@ -44,8 +45,16 @@ function avgIntensities(entries: EmotionEntry[] | null | undefined) {
 }
 
 export const Route = createFileRoute("/pendamping/$childId")({
-  component: ChildDetail,
+  component: GatedChildDetail,
 });
+
+function GatedChildDetail() {
+  return (
+    <RoleGate allow={["parent", "counselor"]}>
+      <ChildDetail />
+    </RoleGate>
+  );
+}
 
 function ChildDetail() {
   const { childId } = Route.useParams();
