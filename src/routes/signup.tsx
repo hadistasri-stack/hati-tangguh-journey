@@ -57,18 +57,30 @@ function SignupPage() {
           <div>
             <Label>Saya adalah</Label>
             <RadioGroup value={role} onValueChange={(v) => setRole(v as Role)} className="mt-2 grid grid-cols-1 gap-2">
-              <label className="flex items-center gap-2 border rounded p-3 cursor-pointer hover:bg-accent">
+              <div
+                role="button"
+                onClick={() => setRole("child")}
+                className={`flex items-center gap-2 border rounded p-3 cursor-pointer hover:bg-accent ${role === "child" ? "border-primary bg-accent/50" : ""}`}
+              >
                 <RadioGroupItem value="child" id="r-child" />
                 <span>Anak / Siswa (main game)</span>
-              </label>
-              <label className="flex items-center gap-2 border rounded p-3 cursor-pointer hover:bg-accent">
+              </div>
+              <div
+                role="button"
+                onClick={() => setRole("parent")}
+                className={`flex items-center gap-2 border rounded p-3 cursor-pointer hover:bg-accent ${role === "parent" ? "border-primary bg-accent/50" : ""}`}
+              >
                 <RadioGroupItem value="parent" id="r-parent" />
                 <span>Orang tua</span>
-              </label>
-              <label className="flex items-center gap-2 border rounded p-3 cursor-pointer hover:bg-accent">
+              </div>
+              <div
+                role="button"
+                onClick={() => setRole("counselor")}
+                className={`flex items-center gap-2 border rounded p-3 cursor-pointer hover:bg-accent ${role === "counselor" ? "border-primary bg-accent/50" : ""}`}
+              >
                 <RadioGroupItem value="counselor" id="r-counselor" />
                 <span>Guru BK</span>
-              </label>
+              </div>
             </RadioGroup>
           </div>
           <div>
