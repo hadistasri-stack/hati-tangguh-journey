@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { SplashScreen } from "@/components/game/SplashScreen";
 import { ConsentScreen } from "@/components/game/ConsentScreen";
 import { AvatarScreen } from "@/components/game/AvatarScreen";
@@ -11,6 +11,7 @@ import { MuhasabahMalam } from "@/components/game/MuhasabahMalam";
 import { ButuhTeman } from "@/components/game/ButuhTeman";
 import { savePlayer, type Avatar, type PreTestData } from "@/lib/game-state";
 import { useAuth } from "@/hooks/useAuth";
+import { useMyRole } from "@/hooks/useMyRole";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
@@ -32,6 +33,15 @@ function ResetHati() {
   const [avatar, setAvatar] = useState<Avatar>("boy-1");
   const [treeLevel, setTreeLevel] = useState(0);
   const { session } = useAuth();
+  const { role } = useMyRole();
+  const navigate = useNavigate();
+
+  // Pendamping (ortu/BK) tidak boleh main game; arahkan ke dashboard pendamping
+  useEffect(() => {
+    if (session && (role === "parent" || role === "counselor")) {
+      navigate({ to: "/pendamping" });
+    }
+  }, [session, role, navigate]);
 
   // Tombol "Astaghfirullah" muncul setelah tutorial dikenalin
   const showPanic =
