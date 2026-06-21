@@ -3,6 +3,7 @@ import { AvatarIcon } from "./AvatarIcon";
 import { PohonIman } from "./PohonIman";
 import { TemanHati } from "./TemanHati";
 import { savePlayer, type Avatar, type DailyProgress } from "@/lib/game-state";
+import { updateStudentSession } from "@/lib/student-session";
 import { BookOpen, Camera, Check, Gamepad2, Lock, MessagesSquare, Moon, Timer } from "lucide-react";
 
 type Props = {
@@ -76,6 +77,13 @@ export function QuestDashboard({ nickname, avatar, treeLevel, onMuhasabah }: Pro
     setDaily((d) => {
       const next = { ...d, [k]: val };
       savePlayer({ daily: next });
+      const today = new Date().toISOString().slice(0, 10);
+      void updateStudentSession({
+        today_date: today,
+        today_sholat: next.sholat,
+        today_belajar: next.belajar,
+        today_sosial: next.sosial,
+      });
       return next;
     });
   }
