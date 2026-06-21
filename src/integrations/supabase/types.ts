@@ -188,6 +188,57 @@ export type Database = {
         }
         Relationships: []
       }
+      student_sessions: {
+        Row: {
+          avatar: string
+          created_at: string
+          id: string
+          last_muhasabah_at: string | null
+          muhasabah_count: number
+          nickname: string
+          panic_taps: number
+          pretest: Json | null
+          today_belajar: boolean
+          today_date: string | null
+          today_sholat: boolean
+          today_sosial: boolean
+          tree_level: number
+          updated_at: string
+        }
+        Insert: {
+          avatar?: string
+          created_at?: string
+          id?: string
+          last_muhasabah_at?: string | null
+          muhasabah_count?: number
+          nickname: string
+          panic_taps?: number
+          pretest?: Json | null
+          today_belajar?: boolean
+          today_date?: string | null
+          today_sholat?: boolean
+          today_sosial?: boolean
+          tree_level?: number
+          updated_at?: string
+        }
+        Update: {
+          avatar?: string
+          created_at?: string
+          id?: string
+          last_muhasabah_at?: string | null
+          muhasabah_count?: number
+          nickname?: string
+          panic_taps?: number
+          pretest?: Json | null
+          today_belajar?: boolean
+          today_date?: string | null
+          today_sholat?: boolean
+          today_sosial?: boolean
+          tree_level?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tree_state: {
         Row: {
           child_id: string
