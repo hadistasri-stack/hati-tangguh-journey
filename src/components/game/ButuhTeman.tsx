@@ -11,8 +11,10 @@ const PHASE_LABEL: Record<Phase, string> = {
 const PHASE_SECONDS: Record<Phase, number> = { in: 4, hold: 7, out: 8 };
 const NEXT_PHASE: Record<Phase, Phase> = { in: "hold", hold: "out", out: "in" };
 
+type Props = { onPanic?: () => void };
+
 // Tombol panic global "Astaghfirullah" — cue interrupt saat craving game
-export function ButuhTeman() {
+export function ButuhTeman({ onPanic }: Props = {}) {
   const [open, setOpen] = useState(false);
   const [phase, setPhase] = useState<Phase>("in");
   const [tick, setTick] = useState(PHASE_SECONDS.in);
@@ -49,7 +51,10 @@ export function ButuhTeman() {
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+          onPanic?.();
+        }}
         className="fixed top-4 right-4 z-40 flex items-center gap-2 rounded-full bg-destructive px-4 py-2.5 text-sm font-bold text-destructive-foreground shadow-soft animate-gentle-pulse transition-gentle hover:scale-105"
         aria-label="Astaghfirullah — pemutus craving game"
       >
