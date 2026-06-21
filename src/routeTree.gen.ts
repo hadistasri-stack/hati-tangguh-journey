@@ -12,11 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UndangRouteImport } from './routes/undang'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as PendampingRouteImport } from './routes/pendamping'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PendampingChildIdRouteImport } from './routes/pendamping.$childId'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 
 const UndangRoute = UndangRouteImport.update({
@@ -34,11 +32,6 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PendampingRoute = PendampingRouteImport.update({
-  id: '/pendamping',
-  path: '/pendamping',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -54,11 +47,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PendampingChildIdRoute = PendampingChildIdRouteImport.update({
-  id: '/$childId',
-  path: '/$childId',
-  getParentRoute: () => PendampingRoute,
-} as any)
 const InviteTokenRoute = InviteTokenRouteImport.update({
   id: '/invite/$token',
   path: '/invite/$token',
@@ -69,35 +57,29 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/pendamping': typeof PendampingRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/undang': typeof UndangRoute
   '/invite/$token': typeof InviteTokenRoute
-  '/pendamping/$childId': typeof PendampingChildIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/pendamping': typeof PendampingRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/undang': typeof UndangRoute
   '/invite/$token': typeof InviteTokenRoute
-  '/pendamping/$childId': typeof PendampingChildIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/pendamping': typeof PendampingRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/undang': typeof UndangRoute
   '/invite/$token': typeof InviteTokenRoute
-  '/pendamping/$childId': typeof PendampingChildIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -105,41 +87,34 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/login'
-    | '/pendamping'
     | '/reset-password'
     | '/signup'
     | '/undang'
     | '/invite/$token'
-    | '/pendamping/$childId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
     | '/login'
-    | '/pendamping'
     | '/reset-password'
     | '/signup'
     | '/undang'
     | '/invite/$token'
-    | '/pendamping/$childId'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
     | '/login'
-    | '/pendamping'
     | '/reset-password'
     | '/signup'
     | '/undang'
     | '/invite/$token'
-    | '/pendamping/$childId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
-  PendampingRoute: typeof PendampingRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   UndangRoute: typeof UndangRoute
@@ -169,13 +144,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pendamping': {
-      id: '/pendamping'
-      path: '/pendamping'
-      fullPath: '/pendamping'
-      preLoaderRoute: typeof PendampingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -197,13 +165,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pendamping/$childId': {
-      id: '/pendamping/$childId'
-      path: '/$childId'
-      fullPath: '/pendamping/$childId'
-      preLoaderRoute: typeof PendampingChildIdRouteImport
-      parentRoute: typeof PendampingRoute
-    }
     '/invite/$token': {
       id: '/invite/$token'
       path: '/invite/$token'
@@ -214,23 +175,10 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface PendampingRouteChildren {
-  PendampingChildIdRoute: typeof PendampingChildIdRoute
-}
-
-const PendampingRouteChildren: PendampingRouteChildren = {
-  PendampingChildIdRoute: PendampingChildIdRoute,
-}
-
-const PendampingRouteWithChildren = PendampingRoute._addFileChildren(
-  PendampingRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
-  PendampingRoute: PendampingRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   UndangRoute: UndangRoute,
