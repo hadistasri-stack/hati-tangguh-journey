@@ -3,7 +3,7 @@ import { AvatarIcon } from "./AvatarIcon";
 import { PohonIman } from "./PohonIman";
 import { TemanHati } from "./TemanHati";
 import { savePlayer, type Avatar, type DailyProgress } from "@/lib/game-state";
-import { updateStudentSession } from "@/lib/student-session";
+import { saveQuestProgress } from "@/lib/student-session";
 import { BookOpen, Camera, Check, Gamepad2, Lock, MessagesSquare, Moon, Timer } from "lucide-react";
 
 type Props = {
@@ -11,12 +11,13 @@ type Props = {
   avatar: Avatar;
   treeLevel: number;
   onMuhasabah: () => void;
+  onTreeLevelChange?: (level: number) => void;
 };
 
 const CYCLE_DAYS = 7;
 
 // Tahap inti: Quest Dashboard Harian — 3 quest + pohon iman + unlock game
-export function QuestDashboard({ nickname, avatar, treeLevel, onMuhasabah }: Props) {
+export function QuestDashboard({ nickname, avatar, treeLevel, onMuhasabah, onTreeLevelChange }: Props) {
   const [daily, setDaily] = useState<DailyProgress>({
     day: 1,
     sholat: false,
@@ -77,12 +78,15 @@ export function QuestDashboard({ nickname, avatar, treeLevel, onMuhasabah }: Pro
     setDaily((d) => {
       const next = { ...d, [k]: val };
       savePlayer({ daily: next });
-      const today = new Date().toISOString().slice(0, 10);
-      void updateStudentSession({
-        today_date: today,
-        today_sholat: next.sholat,
-        today_belajar: next.belajar,
-        today_sosial: next.sosial,
+      // Endpoint server yang validasi & tentukan unlock level (cap 7)
+      void saveQuestProgress({
+        sholat: next.sholat,
+        belajar: next.belajar,
+        sosial: next.sosial,
+      }).then((res) => {
+        if (res?.leveledUp && onTreeLevelChange) {
+          onTreeLevelChange(res.state.tree_level);
+        }
       });
       return next;
     });
