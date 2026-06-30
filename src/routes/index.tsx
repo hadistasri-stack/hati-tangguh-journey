@@ -90,6 +90,10 @@ function ResetHati() {
           avatar={avatar}
           treeLevel={treeLevel}
           onMuhasabah={() => setStage("muhasabah")}
+          onTreeLevelChange={(lvl) => {
+            setTreeLevel(lvl);
+            savePlayer({ treeLevel: lvl });
+          }}
         />
       )}
 
