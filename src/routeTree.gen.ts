@@ -18,6 +18,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PendampingChildIdRouteImport } from './routes/pendamping.$childId'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
+import { Route as ApiPublicQuestRouteImport } from './routes/api/public/quest'
 
 const UndangRoute = UndangRouteImport.update({
   id: '/undang',
@@ -64,6 +65,11 @@ const InviteTokenRoute = InviteTokenRouteImport.update({
   path: '/invite/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicQuestRoute = ApiPublicQuestRouteImport.update({
+  id: '/api/public/quest',
+  path: '/api/public/quest',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/undang': typeof UndangRoute
   '/invite/$token': typeof InviteTokenRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
+  '/api/public/quest': typeof ApiPublicQuestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/undang': typeof UndangRoute
   '/invite/$token': typeof InviteTokenRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
+  '/api/public/quest': typeof ApiPublicQuestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/undang': typeof UndangRoute
   '/invite/$token': typeof InviteTokenRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
+  '/api/public/quest': typeof ApiPublicQuestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/undang'
     | '/invite/$token'
     | '/pendamping/$childId'
+    | '/api/public/quest'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/undang'
     | '/invite/$token'
     | '/pendamping/$childId'
+    | '/api/public/quest'
   id:
     | '__root__'
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/undang'
     | '/invite/$token'
     | '/pendamping/$childId'
+    | '/api/public/quest'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -144,6 +156,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   UndangRoute: typeof UndangRoute
   InviteTokenRoute: typeof InviteTokenRoute
+  ApiPublicQuestRoute: typeof ApiPublicQuestRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InviteTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/quest': {
+      id: '/api/public/quest'
+      path: '/api/public/quest'
+      fullPath: '/api/public/quest'
+      preLoaderRoute: typeof ApiPublicQuestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -235,17 +255,8 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   UndangRoute: UndangRoute,
   InviteTokenRoute: InviteTokenRoute,
+  ApiPublicQuestRoute: ApiPublicQuestRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

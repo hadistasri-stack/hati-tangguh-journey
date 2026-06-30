@@ -43,6 +43,40 @@ export async function updateStudentSession(patch: Patch) {
   await supabase.from("student_sessions").update(patch).eq("id", id);
 }
 
+/**
+ * Simpan jawaban quest harian via endpoint server yang divalidasi.
+ * Server yang menentukan unlock level (cap 7) — klien tidak bisa
+ * mem-bypass aturan dengan mengirim tree_level langsung.
+ */
+export async function saveQuestProgress(patch: {
+  sholat?: boolean;
+  belajar?: boolean;
+  sosial?: boolean;
+}): Promise<{
+  ok: boolean;
+  leveledUp: boolean;
+  state: {
+    tree_level: number;
+    today_sholat: boolean;
+    today_belajar: boolean;
+    today_sosial: boolean;
+    today_date: string;
+  };
+} | null> {
+  const id = getSessionId();
+  if (!id) return null;
+  const res = await fetch("/api/public/quest", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sessionId: id, ...patch }),
+  });
+  if (!res.ok) {
+    console.error("saveQuestProgress failed", await res.text());
+    return null;
+  }
+  return res.json();
+}
+
 export async function incrementPanicTap() {
   const id = getSessionId();
   if (!id) return;
