@@ -14,6 +14,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PendampingRouteImport } from './routes/pendamping'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as GuruRouteImport } from './routes/guru'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PendampingChildIdRouteImport } from './routes/pendamping.$childId'
@@ -44,6 +45,11 @@ const PendampingRoute = PendampingRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuruRoute = GuruRouteImport.update({
+  id: '/guru',
+  path: '/guru',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -80,6 +86,7 @@ const ApiPublicGuruDataRoute = ApiPublicGuruDataRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/guru': typeof GuruRoute
   '/login': typeof LoginRoute
   '/pendamping': typeof PendampingRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/guru': typeof GuruRoute
   '/login': typeof LoginRoute
   '/pendamping': typeof PendampingRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/guru': typeof GuruRoute
   '/login': typeof LoginRoute
   '/pendamping': typeof PendampingRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
@@ -122,6 +131,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/guru'
     | '/login'
     | '/pendamping'
     | '/reset-password'
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dashboard'
+    | '/guru'
     | '/login'
     | '/pendamping'
     | '/reset-password'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/dashboard'
+    | '/guru'
     | '/login'
     | '/pendamping'
     | '/reset-password'
@@ -162,6 +174,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
+  GuruRoute: typeof GuruRoute
   LoginRoute: typeof LoginRoute
   PendampingRoute: typeof PendampingRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -207,6 +220,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guru': {
+      id: '/guru'
+      path: '/guru'
+      fullPath: '/guru'
+      preLoaderRoute: typeof GuruRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -269,6 +289,7 @@ const PendampingRouteWithChildren = PendampingRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
+  GuruRoute: GuruRoute,
   LoginRoute: LoginRoute,
   PendampingRoute: PendampingRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
