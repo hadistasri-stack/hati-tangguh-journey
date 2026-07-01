@@ -14,11 +14,13 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PendampingRouteImport } from './routes/pendamping'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as GuruRouteImport } from './routes/guru'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PendampingChildIdRouteImport } from './routes/pendamping.$childId'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as ApiPublicQuestRouteImport } from './routes/api/public/quest'
+import { Route as ApiPublicGuruDataRouteImport } from './routes/api/public/guru-data'
 
 const UndangRoute = UndangRouteImport.update({
   id: '/undang',
@@ -43,6 +45,11 @@ const PendampingRoute = PendampingRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuruRoute = GuruRouteImport.update({
+  id: '/guru',
+  path: '/guru',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -70,10 +77,16 @@ const ApiPublicQuestRoute = ApiPublicQuestRouteImport.update({
   path: '/api/public/quest',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicGuruDataRoute = ApiPublicGuruDataRouteImport.update({
+  id: '/api/public/guru-data',
+  path: '/api/public/guru-data',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/guru': typeof GuruRoute
   '/login': typeof LoginRoute
   '/pendamping': typeof PendampingRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
@@ -81,11 +94,13 @@ export interface FileRoutesByFullPath {
   '/undang': typeof UndangRoute
   '/invite/$token': typeof InviteTokenRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
+  '/api/public/guru-data': typeof ApiPublicGuruDataRoute
   '/api/public/quest': typeof ApiPublicQuestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/guru': typeof GuruRoute
   '/login': typeof LoginRoute
   '/pendamping': typeof PendampingRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
@@ -93,12 +108,14 @@ export interface FileRoutesByTo {
   '/undang': typeof UndangRoute
   '/invite/$token': typeof InviteTokenRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
+  '/api/public/guru-data': typeof ApiPublicGuruDataRoute
   '/api/public/quest': typeof ApiPublicQuestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/guru': typeof GuruRoute
   '/login': typeof LoginRoute
   '/pendamping': typeof PendampingRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
@@ -106,6 +123,7 @@ export interface FileRoutesById {
   '/undang': typeof UndangRoute
   '/invite/$token': typeof InviteTokenRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
+  '/api/public/guru-data': typeof ApiPublicGuruDataRoute
   '/api/public/quest': typeof ApiPublicQuestRoute
 }
 export interface FileRouteTypes {
@@ -113,6 +131,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/guru'
     | '/login'
     | '/pendamping'
     | '/reset-password'
@@ -120,11 +139,13 @@ export interface FileRouteTypes {
     | '/undang'
     | '/invite/$token'
     | '/pendamping/$childId'
+    | '/api/public/guru-data'
     | '/api/public/quest'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
+    | '/guru'
     | '/login'
     | '/pendamping'
     | '/reset-password'
@@ -132,11 +153,13 @@ export interface FileRouteTypes {
     | '/undang'
     | '/invite/$token'
     | '/pendamping/$childId'
+    | '/api/public/guru-data'
     | '/api/public/quest'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
+    | '/guru'
     | '/login'
     | '/pendamping'
     | '/reset-password'
@@ -144,18 +167,21 @@ export interface FileRouteTypes {
     | '/undang'
     | '/invite/$token'
     | '/pendamping/$childId'
+    | '/api/public/guru-data'
     | '/api/public/quest'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
+  GuruRoute: typeof GuruRoute
   LoginRoute: typeof LoginRoute
   PendampingRoute: typeof PendampingRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   UndangRoute: typeof UndangRoute
   InviteTokenRoute: typeof InviteTokenRoute
+  ApiPublicGuruDataRoute: typeof ApiPublicGuruDataRoute
   ApiPublicQuestRoute: typeof ApiPublicQuestRoute
 }
 
@@ -196,6 +222,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guru': {
+      id: '/guru'
+      path: '/guru'
+      fullPath: '/guru'
+      preLoaderRoute: typeof GuruRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -231,6 +264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicQuestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/guru-data': {
+      id: '/api/public/guru-data'
+      path: '/api/public/guru-data'
+      fullPath: '/api/public/guru-data'
+      preLoaderRoute: typeof ApiPublicGuruDataRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -249,12 +289,14 @@ const PendampingRouteWithChildren = PendampingRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
+  GuruRoute: GuruRoute,
   LoginRoute: LoginRoute,
   PendampingRoute: PendampingRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   UndangRoute: UndangRoute,
   InviteTokenRoute: InviteTokenRoute,
+  ApiPublicGuruDataRoute: ApiPublicGuruDataRoute,
   ApiPublicQuestRoute: ApiPublicQuestRoute,
 }
 export const routeTree = rootRouteImport
