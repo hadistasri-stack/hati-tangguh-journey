@@ -3,7 +3,7 @@ import { AvatarIcon } from "./AvatarIcon";
 import { PohonIman } from "./PohonIman";
 import { TemanHati } from "./TemanHati";
 import { savePlayer, type Avatar, type DailyProgress } from "@/lib/game-state";
-import { saveQuestProgress } from "@/lib/student-session";
+import { loadQuestProgress, saveQuestProgress } from "@/lib/student-session";
 import { BookOpen, Camera, Check, Gamepad2, Lock, MessagesSquare, Moon, Timer } from "lucide-react";
 
 type Props = {
@@ -30,6 +30,27 @@ export function QuestDashboard({ nickname, avatar, treeLevel, onMuhasabah, onTre
   const [studySeconds, setStudySeconds] = useState(30 * 60);
   const [gameActive, setGameActive] = useState(false);
   const [gameSeconds, setGameSeconds] = useState(60 * 60);
+
+  // Muat state quest hari ini dari server saat mount (kalau anak refresh browser).
+  useEffect(() => {
+    let cancelled = false;
+    void loadQuestProgress().then((s) => {
+      if (!s || cancelled) return;
+      setDaily((d) => ({
+        ...d,
+        sholat: s.today_sholat,
+        belajar: s.today_belajar,
+        sosial: s.today_sosial,
+      }));
+      if (onTreeLevelChange && typeof s.tree_level === "number") {
+        onTreeLevelChange(s.tree_level);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const completed = useMemo(
     () => [daily.sholat, daily.belajar, daily.sosial].filter(Boolean).length,
