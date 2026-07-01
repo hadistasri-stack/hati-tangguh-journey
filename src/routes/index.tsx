@@ -13,6 +13,7 @@ import {
   createStudentSession,
   updateStudentSession,
   incrementPanicTap,
+  fetchSessionSnapshot,
 } from "@/lib/student-session";
 
 export const Route = createFileRoute("/")({
@@ -109,6 +110,8 @@ function ResetHati() {
               muhasabah_count: next, // approx; increments each completion
               last_muhasabah_at: new Date().toISOString(),
             });
+            // Ekspor otomatis snapshot harian anak ini ke file JSON.
+            void exportDailySnapshot(nickname);
             setStage("dashboard");
           }}
           onBack={() => setStage("dashboard")}
@@ -116,4 +119,31 @@ function ResetHati() {
       )}
     </>
   );
+}
+
+async function exportDailySnapshot(nickname: string) {
+  try {
+    const snap = await fetchSessionSnapshot();
+    if (!snap) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const payload = {
+      exported_at: new Date().toISOString(),
+      cycle_day: today,
+      ...snap,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const safe = (nickname || "anak").replace(/[^a-zA-Z0-9-_]/g, "_");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ResetHati_${safe}_${today}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    console.error("Gagal ekspor snapshot harian", e);
+  }
 }
