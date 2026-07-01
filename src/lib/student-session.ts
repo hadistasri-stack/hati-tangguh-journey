@@ -44,6 +44,34 @@ export async function updateStudentSession(patch: Patch) {
 }
 
 /**
+ * Muat progres quest harian dari server. Dipakai QuestDashboard saat mount
+ * agar centang quest & tree level ikut yang sudah tersimpan.
+ */
+export async function loadQuestProgress(): Promise<{
+  tree_level: number;
+  today_date: string;
+  today_sholat: boolean;
+  today_belajar: boolean;
+  today_sosial: boolean;
+} | null> {
+  const id = getSessionId();
+  if (!id) return null;
+  const res = await fetch(`/api/public/quest?sessionId=${encodeURIComponent(id)}`);
+  if (!res.ok) return null;
+  const json = await res.json();
+  return json.state ?? null;
+}
+
+export async function fetchSessionSnapshot() {
+  const id = getSessionId();
+  if (!id) return null;
+  const res = await fetch(`/api/public/quest?sessionId=${encodeURIComponent(id)}`);
+  if (!res.ok) return null;
+  const json = await res.json();
+  return json.session ?? null;
+}
+
+/**
  * Simpan jawaban quest harian via endpoint server yang divalidasi.
  * Server yang menentukan unlock level (cap 7) — klien tidak bisa
  * mem-bypass aturan dengan mengirim tree_level langsung.
