@@ -188,6 +188,50 @@ export type Database = {
         }
         Relationships: []
       }
+      student_daily_logs: {
+        Row: {
+          belajar: boolean
+          created_at: string
+          id: string
+          log_date: string
+          panic_taps: number
+          session_id: string
+          sholat: boolean
+          sosial: boolean
+          tree_level: number
+        }
+        Insert: {
+          belajar?: boolean
+          created_at?: string
+          id?: string
+          log_date: string
+          panic_taps?: number
+          session_id: string
+          sholat?: boolean
+          sosial?: boolean
+          tree_level?: number
+        }
+        Update: {
+          belajar?: boolean
+          created_at?: string
+          id?: string
+          log_date?: string
+          panic_taps?: number
+          session_id?: string
+          sholat?: boolean
+          sosial?: boolean
+          tree_level?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_daily_logs_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "student_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_sessions: {
         Row: {
           avatar: string

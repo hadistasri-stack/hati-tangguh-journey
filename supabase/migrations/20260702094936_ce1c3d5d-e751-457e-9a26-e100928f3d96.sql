@@ -1,0 +1,1 @@
+CREATE POLICY "Deny all direct access" ON public.student_daily_logs FOR ALL USING (false);

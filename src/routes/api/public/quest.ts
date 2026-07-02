@@ -75,7 +75,7 @@ export const Route = createFileRoute("/api/public/quest")({
         const { data: session, error: sErr } = await supabaseAdmin
           .from("student_sessions")
           .select(
-            "id, tree_level, today_date, today_sholat, today_belajar, today_sosial",
+            "id, tree_level, today_date, today_sholat, today_belajar, today_sosial, panic_taps",
           )
           .eq("id", sessionId)
           .maybeSingle();
@@ -131,11 +131,22 @@ export const Route = createFileRoute("/api/public/quest")({
           return Response.json({ error: "Update failed" }, { status: 500 });
         }
 
-        // Mirror harian ke daily_progress untuk dashboard Guru BK.
-        // Skip jika gagal — sumber kebenaran utama tetap student_sessions.
-        // child_id di tabel ini berFK ke auth.users, jadi mirror dilewati
-        // saat session anonim (tidak ada user). Disisakan sebagai TODO bila
-        // ingin agregasi lintas-hari yang tahan reset hari.
+        // Simpan snapshot harian ke student_daily_logs agar Guru BK bisa
+        // melihat progres per hari / rentang waktu.
+        await supabaseAdmin
+          .from("student_daily_logs")
+          .upsert(
+            {
+              session_id: sessionId,
+              log_date: today,
+              sholat: nextSholat,
+              belajar: nextBelajar,
+              sosial: nextSosial,
+              tree_level: nextLevel,
+              panic_taps: session.panic_taps ?? 0,
+            },
+            { onConflict: "session_id,log_date" },
+          );
 
         return Response.json({
           ok: true,
