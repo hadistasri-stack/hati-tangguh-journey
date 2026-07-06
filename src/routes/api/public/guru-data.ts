@@ -1,0 +1,76 @@
+import { createFileRoute } from "@tanstack/react-router";
+
+export const Route = createFileRoute("/api/public/guru-data")({
+  server: {
+    handlers: {
+      GET: async ({ request }) => {
+        const url = new URL(request.url);
+        const key = url.searchParams.get("key") ?? "";
+        const expected = process.env.GURU_ACCESS_KEY;
+        if (!expected) {
+          return Response.json({ error: "Server not configured" }, { status: 500 });
+        }
+        if (key !== expected) {
+          return Response.json({ error: "Invalid access key" }, { status: 401 });
+        }
+
+        const search = url.searchParams.get("search") ?? "";
+        const fromDate = url.searchParams.get("fromDate") ?? "";
+        const toDate = url.searchParams.get("toDate") ?? "";
+
+        const { supabaseAdmin } = await import(
+          "@/integrations/supabase/client.server"
+        );
+
+        let studentQuery = supabaseAdmin
+          .from("student_sessions")
+          .select(
+            "id, nickname, avatar, tree_level, today_date, today_sholat, today_belajar, today_sosial, panic_taps, muhasabah_count, last_muhasabah_at, pretest, created_at, updated_at",
+          )
+          .order("updated_at", { ascending: false });
+
+        if (search.trim()) {
+          studentQuery = studentQuery.ilike("nickname", `%${search.trim()}%`);
+        }
+
+        const { data: students, error: sErr } = await studentQuery;
+        if (sErr) {
+          return Response.json({ error: "Server error" }, { status: 500 });
+        }
+
+        const studentIds = (students ?? []).map((s) => s.id);
+
+        let logsByStudent: Record<string, any[]> = {};
+
+        if (studentIds.length > 0 && (fromDate || toDate)) {
+          let logsQuery = supabaseAdmin
+            .from("student_daily_logs")
+            .select("id, session_id, log_date, sholat, belajar, sosial, panic_taps, tree_level")
+            .in("session_id", studentIds)
+            .order("log_date", { ascending: true });
+
+          if (fromDate) logsQuery = logsQuery.gte("log_date", fromDate);
+          if (toDate) logsQuery = logsQuery.lte("log_date", toDate);
+
+          const { data: logs, error: lErr } = await logsQuery;
+          if (lErr) {
+            return Response.json({ error: "Server error" }, { status: 500 });
+          }
+
+          for (const log of logs ?? []) {
+            if (!logsByStudent[log.session_id]) {
+              logsByStudent[log.session_id] = [];
+            }
+            logsByStudent[log.session_id].push(log);
+          }
+        }
+
+        return Response.json({
+          ok: true,
+          students: students ?? [],
+          dailyLogs: logsByStudent,
+        });
+      },
+    },
+  },
+});
