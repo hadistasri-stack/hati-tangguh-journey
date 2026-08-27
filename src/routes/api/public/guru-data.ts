@@ -25,12 +25,12 @@ export const Route = createFileRoute("/api/public/guru-data")({
         let studentQuery = supabaseAdmin
           .from("student_sessions")
           .select(
-            "id, nickname, avatar, tree_level, today_date, today_sholat, today_belajar, today_sosial, panic_taps, muhasabah_count, last_muhasabah_at, pretest, created_at, updated_at",
+            "id, nickname, kelas, avatar, tree_level, today_date, today_sholat, today_belajar, today_sosial, panic_taps, muhasabah_count, last_muhasabah_at, pretest, created_at, updated_at",
           )
           .order("updated_at", { ascending: false });
 
         if (search.trim()) {
-          studentQuery = studentQuery.ilike("nickname", `%${search.trim()}%`);
+          studentQuery = studentQuery.or(`nickname.ilike.%${search.trim()}%,kelas.ilike.%${search.trim()}%`);
         }
 
         const { data: students, error: sErr } = await studentQuery;

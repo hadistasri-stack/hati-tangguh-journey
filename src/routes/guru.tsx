@@ -9,6 +9,7 @@ const KEY_STORAGE = "reset-hati:guru-key";
 type Student = {
   id: string;
   nickname: string;
+  kelas: string;
   avatar: string;
   tree_level: number;
   today_date: string | null;
@@ -181,7 +182,11 @@ function GuruDashboard() {
 
   const filteredStudents = (students ?? []).filter((s) => {
     if (!activeSearch.trim()) return true;
-    return s.nickname.toLowerCase().includes(activeSearch.trim().toLowerCase());
+    const q = activeSearch.trim().toLowerCase();
+    return (
+      s.nickname.toLowerCase().includes(q) ||
+      (s.kelas ?? "").toLowerCase().includes(q)
+    );
   });
 
   const today = new Date().toISOString().slice(0, 10);
@@ -326,7 +331,7 @@ function GuruDashboard() {
                       <div className="min-w-0">
                         <p className="font-semibold truncate">{s.nickname}</p>
                         <p className="text-xs text-muted-foreground">
-                          Mulai{" "}
+                          Kelas {s.kelas || "-"} · Mulai{" "}
                           {new Date(s.created_at).toLocaleDateString("id-ID")} ·
                           Pohon Lvl {s.tree_level}/7 · Muhasabah{" "}
                           {s.muhasabah_count}×
