@@ -20,6 +20,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PendampingChildIdRouteImport } from './routes/pendamping.$childId'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as ApiPublicQuestRouteImport } from './routes/api/public/quest'
+import { Route as ApiPublicOrtuRouteImport } from './routes/api/public/ortu'
 import { Route as ApiPublicGuruDataRouteImport } from './routes/api/public/guru-data'
 
 const UndangRoute = UndangRouteImport.update({
@@ -77,6 +78,11 @@ const ApiPublicQuestRoute = ApiPublicQuestRouteImport.update({
   path: '/api/public/quest',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicOrtuRoute = ApiPublicOrtuRouteImport.update({
+  id: '/api/public/ortu',
+  path: '/api/public/ortu',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicGuruDataRoute = ApiPublicGuruDataRouteImport.update({
   id: '/api/public/guru-data',
   path: '/api/public/guru-data',
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/invite/$token': typeof InviteTokenRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
   '/api/public/guru-data': typeof ApiPublicGuruDataRoute
+  '/api/public/ortu': typeof ApiPublicOrtuRoute
   '/api/public/quest': typeof ApiPublicQuestRoute
 }
 export interface FileRoutesByTo {
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/invite/$token': typeof InviteTokenRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
   '/api/public/guru-data': typeof ApiPublicGuruDataRoute
+  '/api/public/ortu': typeof ApiPublicOrtuRoute
   '/api/public/quest': typeof ApiPublicQuestRoute
 }
 export interface FileRoutesById {
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/invite/$token': typeof InviteTokenRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
   '/api/public/guru-data': typeof ApiPublicGuruDataRoute
+  '/api/public/ortu': typeof ApiPublicOrtuRoute
   '/api/public/quest': typeof ApiPublicQuestRoute
 }
 export interface FileRouteTypes {
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/pendamping/$childId'
     | '/api/public/guru-data'
+    | '/api/public/ortu'
     | '/api/public/quest'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/pendamping/$childId'
     | '/api/public/guru-data'
+    | '/api/public/ortu'
     | '/api/public/quest'
   id:
     | '__root__'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/pendamping/$childId'
     | '/api/public/guru-data'
+    | '/api/public/ortu'
     | '/api/public/quest'
   fileRoutesById: FileRoutesById
 }
@@ -182,6 +194,7 @@ export interface RootRouteChildren {
   UndangRoute: typeof UndangRoute
   InviteTokenRoute: typeof InviteTokenRoute
   ApiPublicGuruDataRoute: typeof ApiPublicGuruDataRoute
+  ApiPublicOrtuRoute: typeof ApiPublicOrtuRoute
   ApiPublicQuestRoute: typeof ApiPublicQuestRoute
 }
 
@@ -264,6 +277,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicQuestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/ortu': {
+      id: '/api/public/ortu'
+      path: '/api/public/ortu'
+      fullPath: '/api/public/ortu'
+      preLoaderRoute: typeof ApiPublicOrtuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/guru-data': {
       id: '/api/public/guru-data'
       path: '/api/public/guru-data'
@@ -297,6 +317,7 @@ const rootRouteChildren: RootRouteChildren = {
   UndangRoute: UndangRoute,
   InviteTokenRoute: InviteTokenRoute,
   ApiPublicGuruDataRoute: ApiPublicGuruDataRoute,
+  ApiPublicOrtuRoute: ApiPublicOrtuRoute,
   ApiPublicQuestRoute: ApiPublicQuestRoute,
 }
 export const routeTree = rootRouteImport
