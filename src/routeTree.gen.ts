@@ -13,6 +13,7 @@ import { Route as UndangRouteImport } from './routes/undang'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PendampingRouteImport } from './routes/pendamping'
+import { Route as OrtuRouteImport } from './routes/ortu'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as GuruRouteImport } from './routes/guru'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -41,6 +42,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const PendampingRoute = PendampingRouteImport.update({
   id: '/pendamping',
   path: '/pendamping',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrtuRoute = OrtuRouteImport.update({
+  id: '/ortu',
+  path: '/ortu',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/guru': typeof GuruRoute
   '/login': typeof LoginRoute
+  '/ortu': typeof OrtuRoute
   '/pendamping': typeof PendampingRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/guru': typeof GuruRoute
   '/login': typeof LoginRoute
+  '/ortu': typeof OrtuRoute
   '/pendamping': typeof PendampingRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/guru': typeof GuruRoute
   '/login': typeof LoginRoute
+  '/ortu': typeof OrtuRoute
   '/pendamping': typeof PendampingRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
@@ -142,6 +151,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/guru'
     | '/login'
+    | '/ortu'
     | '/pendamping'
     | '/reset-password'
     | '/signup'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/guru'
     | '/login'
+    | '/ortu'
     | '/pendamping'
     | '/reset-password'
     | '/signup'
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/guru'
     | '/login'
+    | '/ortu'
     | '/pendamping'
     | '/reset-password'
     | '/signup'
@@ -188,6 +200,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   GuruRoute: typeof GuruRoute
   LoginRoute: typeof LoginRoute
+  OrtuRoute: typeof OrtuRoute
   PendampingRoute: typeof PendampingRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
@@ -226,6 +239,13 @@ declare module '@tanstack/react-router' {
       path: '/pendamping'
       fullPath: '/pendamping'
       preLoaderRoute: typeof PendampingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ortu': {
+      id: '/ortu'
+      path: '/ortu'
+      fullPath: '/ortu'
+      preLoaderRoute: typeof OrtuRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -311,6 +331,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   GuruRoute: GuruRoute,
   LoginRoute: LoginRoute,
+  OrtuRoute: OrtuRoute,
   PendampingRoute: PendampingRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,

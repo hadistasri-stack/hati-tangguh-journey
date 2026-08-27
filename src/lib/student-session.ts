@@ -12,10 +12,14 @@ function setSessionId(id: string) {
   localStorage.setItem(KEY, id);
 }
 
-export async function createStudentSession(nickname: string, avatar: Avatar) {
+export async function createStudentSession(
+  nickname: string,
+  avatar: Avatar,
+  kelas: string,
+) {
   const { data, error } = await supabase
     .from("student_sessions")
-    .insert({ nickname, avatar })
+    .insert({ nickname, avatar, kelas })
     .select("id")
     .single();
   if (error) throw error;
@@ -25,6 +29,7 @@ export async function createStudentSession(nickname: string, avatar: Avatar) {
 
 type Patch = {
   nickname?: string;
+  kelas?: string;
   avatar?: Avatar;
   tree_level?: number;
   pretest?: PreTestData;
