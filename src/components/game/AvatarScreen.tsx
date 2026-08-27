@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AvatarIcon } from "./AvatarIcon";
 import type { Avatar } from "@/lib/game-state";
 
-type Props = { onDone: (avatar: Avatar, nickname: string) => void };
+type Props = { onDone: (avatar: Avatar, nickname: string, kelas: string) => void };
 
 const AVATARS: { id: Avatar; label: string }[] = [
   { id: "boy-1", label: "Anak laki 1" },
@@ -15,17 +15,22 @@ const AVATARS: { id: Avatar; label: string }[] = [
 export function AvatarScreen({ onDone }: Props) {
   const [selected, setSelected] = useState<Avatar | null>(null);
   const [nickname, setNickname] = useState("");
+  const [kelas, setKelas] = useState("");
 
-  const valid = selected && nickname.trim().length >= 2 && nickname.trim().length <= 16;
+  const valid =
+    !!selected &&
+    nickname.trim().length >= 2 &&
+    nickname.trim().length <= 24 &&
+    kelas.trim().length >= 1;
 
   return (
     <div className="min-h-screen bg-sunset flex items-center justify-center p-4">
       <div className="w-full max-w-2xl bg-card rounded-3xl shadow-soft p-8 animate-fade-up">
         <h1 className="text-2xl font-extrabold text-center text-foreground">
-          Pilih temenmu hari ini 🌟
+          Daftar dulu yuk 🌟
         </h1>
         <p className="mt-2 text-center text-sm text-muted-foreground">
-          Avatar ini yang bakal nemenin perjalanan hati kamu.
+          Isi nama & kelas, lalu pilih avatar yang nemenin perjalanan hati kamu.
         </p>
 
         <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -49,7 +54,7 @@ export function AvatarScreen({ onDone }: Props) {
 
         <div className="mt-6">
           <label htmlFor="nickname" className="block text-sm font-bold text-foreground mb-2">
-            Nama panggilan kamu
+            Nama kamu
           </label>
           <input
             id="nickname"
@@ -57,18 +62,33 @@ export function AvatarScreen({ onDone }: Props) {
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
             placeholder="Contoh: Bintang"
-            maxLength={16}
+            maxLength={24}
             className="w-full rounded-2xl border-2 border-border bg-background px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-gentle"
           />
           <p className="mt-1 text-xs text-muted-foreground">
-            Boleh nama panggilan, nama hewan kesayangan, atau apa aja yang kamu suka.
+            Tulis nama yang dikenal guru BK kamu, ya.
           </p>
+        </div>
+
+        <div className="mt-4">
+          <label htmlFor="kelas" className="block text-sm font-bold text-foreground mb-2">
+            Kelas kamu
+          </label>
+          <input
+            id="kelas"
+            type="text"
+            value={kelas}
+            onChange={(e) => setKelas(e.target.value)}
+            placeholder="Contoh: X IPA 1"
+            maxLength={20}
+            className="w-full rounded-2xl border-2 border-border bg-background px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-gentle"
+          />
         </div>
 
         <button
           type="button"
           disabled={!valid}
-          onClick={() => valid && onDone(selected!, nickname.trim())}
+          onClick={() => valid && onDone(selected!, nickname.trim(), kelas.trim())}
           className="mt-6 w-full rounded-2xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-soft transition-gentle hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Lanjut

@@ -10,9 +10,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 type Role = "child" | "parent" | "counselor";
 
 export const Route = createFileRoute("/signup")({
-  validateSearch: (s: Record<string, unknown>) => ({
-    role: (s.role as Role) || undefined,
-    inviteToken: (s.inviteToken as string) || undefined,
+  validateSearch: (
+    s: Record<string, unknown>,
+  ): { role?: Role; inviteToken?: string } => ({
+    role: (s.role as Role | undefined) || undefined,
+    inviteToken: (s.inviteToken as string | undefined) || undefined,
   }),
   component: SignupPage,
 });

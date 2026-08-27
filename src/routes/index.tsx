@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { SplashScreen } from "@/components/game/SplashScreen";
+import { RolePicker } from "@/components/game/RolePicker";
 import { ConsentScreen } from "@/components/game/ConsentScreen";
 import { AvatarScreen } from "@/components/game/AvatarScreen";
 import { TutorialScreen } from "@/components/game/TutorialScreen";
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/")({
 
 type Stage =
   | "splash"
+  | "role"
   | "consent"
   | "avatar"
   | "tutorial"
@@ -30,6 +32,7 @@ type Stage =
   | "muhasabah";
 
 function ResetHati() {
+  const navigate = useNavigate();
   const [stage, setStage] = useState<Stage>("splash");
   const [nickname, setNickname] = useState("");
   const [avatar, setAvatar] = useState<Avatar>("boy-1");
@@ -43,7 +46,21 @@ function ResetHati() {
     <>
       {showPanic && <ButuhTeman onPanic={() => { void incrementPanicTap(); }} />}
 
-      {stage === "splash" && <SplashScreen onDone={() => setStage("consent")} />}
+      {stage === "splash" && <SplashScreen onDone={() => setStage("role")} />}
+
+      {stage === "role" && (
+        <RolePicker
+          onPick={(role) => {
+            if (role === "guru") {
+              void navigate({ to: "/guru" });
+            } else if (role === "ortu") {
+              void navigate({ to: "/ortu" });
+            } else {
+              setStage("consent");
+            }
+          }}
+        />
+      )}
 
       {stage === "consent" && (
         <ConsentScreen
@@ -56,12 +73,12 @@ function ResetHati() {
 
       {stage === "avatar" && (
         <AvatarScreen
-          onDone={async (a, n) => {
+          onDone={async (a, n, k) => {
             setAvatar(a);
             setNickname(n);
             savePlayer({ avatar: a, nickname: n });
             try {
-              await createStudentSession(n, a);
+              await createStudentSession(n, a, k);
             } catch (e) {
               console.error("Gagal membuat sesi siswa", e);
             }
