@@ -101,7 +101,7 @@ function LoginPage() {
 
         <p className="text-sm text-center mt-6 text-muted-foreground">
           Belum punya akun?{" "}
-          <Link to="/signup" search={{}} className="text-primary font-semibold">Daftar</Link>
+          <Link to="/signup" className="text-primary font-semibold">Daftar</Link>
         </p>
       </Card>
     </div>
