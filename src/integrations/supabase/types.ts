@@ -237,6 +237,7 @@ export type Database = {
           avatar: string
           created_at: string
           id: string
+          kelas: string
           last_muhasabah_at: string | null
           muhasabah_count: number
           nickname: string
@@ -253,6 +254,7 @@ export type Database = {
           avatar?: string
           created_at?: string
           id?: string
+          kelas?: string
           last_muhasabah_at?: string | null
           muhasabah_count?: number
           nickname: string
@@ -269,6 +271,7 @@ export type Database = {
           avatar?: string
           created_at?: string
           id?: string
+          kelas?: string
           last_muhasabah_at?: string | null
           muhasabah_count?: number
           nickname?: string

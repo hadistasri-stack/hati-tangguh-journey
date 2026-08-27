@@ -1,0 +1,2 @@
+ALTER TABLE public.student_sessions ADD COLUMN IF NOT EXISTS kelas text NOT NULL DEFAULT '';
+CREATE INDEX IF NOT EXISTS student_sessions_nickname_kelas_idx ON public.student_sessions (lower(nickname), lower(kelas));
