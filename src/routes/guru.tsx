@@ -19,6 +19,7 @@ type Student = {
   panic_taps: number;
   muhasabah_count: number;
   last_muhasabah_at: string | null;
+  last_seen_at: string | null;
   pretest: { entries?: { emotion: string; intensity: number }[] } | null;
   created_at: string;
   updated_at: string;
@@ -35,6 +36,98 @@ type DailyLog = {
   tree_level: number;
 };
 
+type ActivityEvent = {
+  id: string;
+  session_id: string;
+  event_type: string;
+  detail: Record<string, unknown> | null;
+  log_date: string;
+  created_at: string;
+};
+
+const EVENT_LABEL: Record<string, string> = {
+  masuk_game: "🎮 Masuk & daftar",
+  pretest: "😊 Isi Emotion Meter",
+  quest: "✅ Kerjakan quest harian",
+  panic: '🤲 Tap "Astaghfirullah"',
+  muhasabah: "🌙 Muhasabah malam",
+  selesai_sesi: "🏁 Selesai sesi",
+};
+
+const HARI = [
+  "Minggu",
+  "Senin",
+  "Selasa",
+  "Rabu",
+  "Kamis",
+  "Jumat",
+  "Sabtu",
+];
+
+function tanggalLengkap(iso: string) {
+  const d = new Date(iso);
+  return `${HARI[d.getDay()]}, ${d.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  })} · ${d.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+  })} WIB`;
+}
+
+/** Ringkas perkembangan anak dari riwayat harian. */
+function analisaPerkembangan(logs: DailyLog[], s: Student) {
+  const sorted = [...logs].sort((a, b) => a.log_date.localeCompare(b.log_date));
+  const skor = sorted.map(
+    (l) => [l.sholat, l.belajar, l.sosial].filter(Boolean).length,
+  );
+  const hariAktif = sorted.length;
+  const totalQuest = skor.reduce((a, b) => a + b, 0);
+  const rata = hariAktif ? totalQuest / hariAktif : 0;
+
+  const half = Math.floor(skor.length / 2);
+  const awal = skor.slice(0, half);
+  const akhir = skor.slice(skor.length - half);
+  const avg = (arr: number[]) =>
+    arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+  const delta = half >= 1 ? avg(akhir) - avg(awal) : 0;
+
+  let status: "naik" | "stabil" | "turun" | "baru";
+  if (hariAktif < 2) status = "baru";
+  else if (delta > 0.3) status = "naik";
+  else if (delta < -0.3) status = "turun";
+  else status = "stabil";
+
+  const saran: string[] = [];
+  if (status === "baru")
+    saran.push("Data masih sedikit — dampingi anak agar rutin main tiap hari.");
+  if (status === "naik")
+    saran.push("Tren membaik. Beri apresiasi agar konsistensinya terjaga.");
+  if (status === "stabil")
+    saran.push("Progres datar. Coba beri target kecil harian yang menantang.");
+  if (status === "turun")
+    saran.push("Progres menurun. Perlu sesi konseling individual.");
+  const lemah = ["sholat", "belajar", "sosial"].filter((k) => {
+    const hit = sorted.filter((l) => (l as any)[k]).length;
+    return hariAktif > 0 && hit / hariAktif < 0.5;
+  });
+  if (lemah.length) saran.push(`Aspek yang paling sering terlewat: ${lemah.join(", ")}.`);
+  if (s.panic_taps >= 5)
+    saran.push('Sering tap "Astaghfirullah" — cek kondisi emosinya.');
+  if (s.muhasabah_count === 0)
+    saran.push("Belum pernah muhasabah malam — ingatkan refleksi harian.");
+
+  return { hariAktif, totalQuest, rata, status, saran };
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  naik: "📈 Membaik",
+  stabil: "➖ Stabil",
+  turun: "📉 Menurun",
+  baru: "🆕 Data awal",
+};
+
 export const Route = createFileRoute("/guru")({
   component: GuruDashboard,
 });
@@ -44,6 +137,8 @@ function GuruDashboard() {
   const [input, setInput] = useState("");
   const [students, setStudents] = useState<Student[] | null>(null);
   const [dailyLogs, setDailyLogs] = useState<Record<string, DailyLog[]>>({});
+  const [events, setEvents] = useState<Record<string, ActivityEvent[]>>({});
+  const [openId, setOpenId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -99,6 +194,7 @@ function GuruDashboard() {
           if (cancelled) return;
           setStudents(json.students ?? []);
           setDailyLogs(json.dailyLogs ?? {});
+          setEvents(json.events ?? {});
         })
         .catch((e: Error) => {
           if (cancelled) return;
@@ -324,6 +420,9 @@ function GuruDashboard() {
                   : 0;
                 const logs = dailyLogs[s.id] ?? [];
                 const hasLogs = logs.length > 0;
+                const evs = events[s.id] ?? [];
+                const isOpen = openId === s.id;
+                const analisa = analisaPerkembangan(logs, s);
 
                 return (
                   <Card key={s.id} className="p-4">
@@ -358,8 +457,62 @@ function GuruDashboard() {
                       </div>
                     </div>
 
+                    {/* Ringkasan perkembangan */}
+                    <div className="mt-3 rounded-md bg-muted/40 p-3 space-y-1">
+                      <p className="text-xs font-medium">
+                        Perkembangan: {STATUS_LABEL[analisa.status]} · aktif{" "}
+                        {analisa.hariAktif} hari · rata-rata{" "}
+                        {analisa.rata.toFixed(1)}/3 quest per hari
+                      </p>
+                      <ul className="text-xs text-muted-foreground list-disc pl-4">
+                        {analisa.saran.map((t) => (
+                          <li key={t}>{t}</li>
+                        ))}
+                      </ul>
+                      <p className="text-xs text-muted-foreground pt-1">
+                        Terakhir terlihat:{" "}
+                        {s.last_seen_at
+                          ? tanggalLengkap(s.last_seen_at)
+                          : tanggalLengkap(s.updated_at)}
+                      </p>
+                    </div>
+
+                    <div className="mt-3">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setOpenId(isOpen ? null : s.id)}
+                      >
+                        {isOpen ? "Tutup detail" : "Lihat detail & riwayat"}
+                      </Button>
+                    </div>
+
+                    {isOpen && (
+                      <div className="mt-3 space-y-1">
+                        <p className="text-xs font-medium">
+                          Riwayat aktivitas (hari, tanggal, jam)
+                        </p>
+                        {evs.length === 0 ? (
+                          <p className="text-xs text-muted-foreground">
+                            Belum ada catatan aktivitas.
+                          </p>
+                        ) : (
+                          <ul className="text-xs text-muted-foreground space-y-1 max-h-64 overflow-y-auto pr-1">
+                            {evs.map((ev) => (
+                              <li key={ev.id} className="border-b pb-1">
+                                <span className="text-foreground">
+                                  {EVENT_LABEL[ev.event_type] ?? ev.event_type}
+                                </span>{" "}
+                                — {tanggalLengkap(ev.created_at)}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    )}
+
                     {/* Daily progress table */}
-                    {hasLogs && (
+                    {hasLogs && (isOpen || hasDateFilter) && (
                       <div className="mt-4 overflow-x-auto">
                         <table className="w-full text-xs border-collapse">
                           <thead>

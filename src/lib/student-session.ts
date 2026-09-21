@@ -24,7 +24,27 @@ export async function createStudentSession(
     .single();
   if (error) throw error;
   setSessionId(data.id);
+  void logEvent("masuk_game", { nickname, kelas }, data.id);
   return data.id;
+}
+
+/** Catat jejak aktivitas anak (tanggal + jam otomatis di server). */
+export async function logEvent(
+  type: "masuk_game" | "pretest" | "quest" | "panic" | "muhasabah" | "selesai_sesi",
+  detail: Record<string, unknown> = {},
+  sessionIdOverride?: string,
+) {
+  const id = sessionIdOverride ?? getSessionId();
+  if (!id) return;
+  try {
+    await fetch("/api/public/event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId: id, type, detail }),
+    });
+  } catch {
+    /* jangan ganggu permainan kalau gagal */
+  }
 }
 
 type Patch = {
@@ -120,4 +140,5 @@ export async function incrementPanicTap() {
     .maybeSingle();
   const next = (data?.panic_taps ?? 0) + 1;
   await supabase.from("student_sessions").update({ panic_taps: next }).eq("id", id);
+  void logEvent("panic", { total: next });
 }
