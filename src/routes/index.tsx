@@ -14,6 +14,7 @@ import {
   createStudentSession,
   updateStudentSession,
   incrementPanicTap,
+  logEvent,
   fetchSessionSnapshot,
 } from "@/lib/student-session";
 
@@ -97,6 +98,7 @@ function ResetHati() {
           onDone={(data: PreTestData) => {
             savePlayer({ preTest: data });
             void updateStudentSession({ pretest: data });
+            void logEvent("pretest", { entries: data as unknown });
             setStage("dashboard");
           }}
         />
