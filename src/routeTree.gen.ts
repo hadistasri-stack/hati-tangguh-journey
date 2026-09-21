@@ -23,6 +23,7 @@ import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as ApiPublicQuestRouteImport } from './routes/api/public/quest'
 import { Route as ApiPublicOrtuRouteImport } from './routes/api/public/ortu'
 import { Route as ApiPublicGuruDataRouteImport } from './routes/api/public/guru-data'
+import { Route as ApiPublicEventRouteImport } from './routes/api/public/event'
 
 const UndangRoute = UndangRouteImport.update({
   id: '/undang',
@@ -94,6 +95,11 @@ const ApiPublicGuruDataRoute = ApiPublicGuruDataRouteImport.update({
   path: '/api/public/guru-data',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicEventRoute = ApiPublicEventRouteImport.update({
+  id: '/api/public/event',
+  path: '/api/public/event',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/undang': typeof UndangRoute
   '/invite/$token': typeof InviteTokenRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
+  '/api/public/event': typeof ApiPublicEventRoute
   '/api/public/guru-data': typeof ApiPublicGuruDataRoute
   '/api/public/ortu': typeof ApiPublicOrtuRoute
   '/api/public/quest': typeof ApiPublicQuestRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/undang': typeof UndangRoute
   '/invite/$token': typeof InviteTokenRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
+  '/api/public/event': typeof ApiPublicEventRoute
   '/api/public/guru-data': typeof ApiPublicGuruDataRoute
   '/api/public/ortu': typeof ApiPublicOrtuRoute
   '/api/public/quest': typeof ApiPublicQuestRoute
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/undang': typeof UndangRoute
   '/invite/$token': typeof InviteTokenRoute
   '/pendamping/$childId': typeof PendampingChildIdRoute
+  '/api/public/event': typeof ApiPublicEventRoute
   '/api/public/guru-data': typeof ApiPublicGuruDataRoute
   '/api/public/ortu': typeof ApiPublicOrtuRoute
   '/api/public/quest': typeof ApiPublicQuestRoute
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/undang'
     | '/invite/$token'
     | '/pendamping/$childId'
+    | '/api/public/event'
     | '/api/public/guru-data'
     | '/api/public/ortu'
     | '/api/public/quest'
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/undang'
     | '/invite/$token'
     | '/pendamping/$childId'
+    | '/api/public/event'
     | '/api/public/guru-data'
     | '/api/public/ortu'
     | '/api/public/quest'
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/undang'
     | '/invite/$token'
     | '/pendamping/$childId'
+    | '/api/public/event'
     | '/api/public/guru-data'
     | '/api/public/ortu'
     | '/api/public/quest'
@@ -206,6 +218,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   UndangRoute: typeof UndangRoute
   InviteTokenRoute: typeof InviteTokenRoute
+  ApiPublicEventRoute: typeof ApiPublicEventRoute
   ApiPublicGuruDataRoute: typeof ApiPublicGuruDataRoute
   ApiPublicOrtuRoute: typeof ApiPublicOrtuRoute
   ApiPublicQuestRoute: typeof ApiPublicQuestRoute
@@ -311,6 +324,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicGuruDataRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/event': {
+      id: '/api/public/event'
+      path: '/api/public/event'
+      fullPath: '/api/public/event'
+      preLoaderRoute: typeof ApiPublicEventRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -337,6 +357,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   UndangRoute: UndangRoute,
   InviteTokenRoute: InviteTokenRoute,
+  ApiPublicEventRoute: ApiPublicEventRoute,
   ApiPublicGuruDataRoute: ApiPublicGuruDataRoute,
   ApiPublicOrtuRoute: ApiPublicOrtuRoute,
   ApiPublicQuestRoute: ApiPublicQuestRoute,
