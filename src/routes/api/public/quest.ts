@@ -148,6 +148,23 @@ export const Route = createFileRoute("/api/public/quest")({
             { onConflict: "session_id,log_date" },
           );
 
+        // Catat jejak aktivitas (tanggal + jam) untuk dashboard Guru BK.
+        await supabaseAdmin.from("student_activity_events").insert({
+          session_id: sessionId,
+          event_type: "quest",
+          detail: {
+            sholat: nextSholat,
+            belajar: nextBelajar,
+            sosial: nextSosial,
+            tree_level: nextLevel,
+            leveled_up: shouldLevelUp,
+          },
+        });
+        await supabaseAdmin
+          .from("student_sessions")
+          .update({ last_seen_at: new Date().toISOString() })
+          .eq("id", sessionId);
+
         return Response.json({
           ok: true,
           leveledUp: shouldLevelUp,
