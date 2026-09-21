@@ -136,6 +136,8 @@ function GuruDashboard() {
   const [input, setInput] = useState("");
   const [students, setStudents] = useState<Student[] | null>(null);
   const [dailyLogs, setDailyLogs] = useState<Record<string, DailyLog[]>>({});
+  const [events, setEvents] = useState<Record<string, ActivityEvent[]>>({});
+  const [openId, setOpenId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -191,6 +193,7 @@ function GuruDashboard() {
           if (cancelled) return;
           setStudents(json.students ?? []);
           setDailyLogs(json.dailyLogs ?? {});
+          setEvents(json.events ?? {});
         })
         .catch((e: Error) => {
           if (cancelled) return;
