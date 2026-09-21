@@ -40,9 +40,10 @@ export const Route = createFileRoute("/api/public/guru-data")({
 
         const studentIds = (students ?? []).map((s) => s.id);
 
-        let logsByStudent: Record<string, any[]> = {};
+        const logsByStudent: Record<string, any[]> = {};
+        const eventsByStudent: Record<string, any[]> = {};
 
-        if (studentIds.length > 0 && (fromDate || toDate)) {
+        if (studentIds.length > 0) {
           let logsQuery = supabaseAdmin
             .from("student_daily_logs")
             .select("id, session_id, log_date, sholat, belajar, sosial, panic_taps, tree_level")
@@ -63,12 +64,33 @@ export const Route = createFileRoute("/api/public/guru-data")({
             }
             logsByStudent[log.session_id].push(log);
           }
+
+          let evQuery = supabaseAdmin
+            .from("student_activity_events")
+            .select("id, session_id, event_type, detail, log_date, created_at")
+            .in("session_id", studentIds)
+            .order("created_at", { ascending: false })
+            .limit(1000);
+
+          if (fromDate) evQuery = evQuery.gte("log_date", fromDate);
+          if (toDate) evQuery = evQuery.lte("log_date", toDate);
+
+          const { data: events } = await evQuery;
+          for (const ev of events ?? []) {
+            if (!eventsByStudent[ev.session_id]) {
+              eventsByStudent[ev.session_id] = [];
+            }
+            if (eventsByStudent[ev.session_id].length < 60) {
+              eventsByStudent[ev.session_id].push(ev);
+            }
+          }
         }
 
         return Response.json({
           ok: true,
           students: students ?? [],
           dailyLogs: logsByStudent,
+          events: eventsByStudent,
         });
       },
     },
