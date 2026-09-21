@@ -188,6 +188,41 @@ export type Database = {
         }
         Relationships: []
       }
+      student_activity_events: {
+        Row: {
+          created_at: string
+          detail: Json
+          event_type: string
+          id: string
+          log_date: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: Json
+          event_type: string
+          id?: string
+          log_date?: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          detail?: Json
+          event_type?: string
+          id?: string
+          log_date?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_activity_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "student_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_daily_logs: {
         Row: {
           belajar: boolean
@@ -239,6 +274,7 @@ export type Database = {
           id: string
           kelas: string
           last_muhasabah_at: string | null
+          last_seen_at: string | null
           muhasabah_count: number
           nickname: string
           panic_taps: number
@@ -256,6 +292,7 @@ export type Database = {
           id?: string
           kelas?: string
           last_muhasabah_at?: string | null
+          last_seen_at?: string | null
           muhasabah_count?: number
           nickname: string
           panic_taps?: number
@@ -273,6 +310,7 @@ export type Database = {
           id?: string
           kelas?: string
           last_muhasabah_at?: string | null
+          last_seen_at?: string | null
           muhasabah_count?: number
           nickname?: string
           panic_taps?: number
