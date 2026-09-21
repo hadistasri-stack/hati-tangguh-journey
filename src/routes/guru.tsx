@@ -19,6 +19,7 @@ type Student = {
   panic_taps: number;
   muhasabah_count: number;
   last_muhasabah_at: string | null;
+  last_seen_at: string | null;
   pretest: { entries?: { emotion: string; intensity: number }[] } | null;
   created_at: string;
   updated_at: string;
@@ -419,6 +420,9 @@ function GuruDashboard() {
                   : 0;
                 const logs = dailyLogs[s.id] ?? [];
                 const hasLogs = logs.length > 0;
+                const evs = events[s.id] ?? [];
+                const isOpen = openId === s.id;
+                const analisa = analisaPerkembangan(logs, s);
 
                 return (
                   <Card key={s.id} className="p-4">
