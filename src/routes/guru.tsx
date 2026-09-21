@@ -35,6 +35,98 @@ type DailyLog = {
   tree_level: number;
 };
 
+type ActivityEvent = {
+  id: string;
+  session_id: string;
+  event_type: string;
+  detail: Record<string, unknown> | null;
+  log_date: string;
+  created_at: string;
+};
+
+const EVENT_LABEL: Record<string, string> = {
+  masuk_game: "🎮 Masuk & daftar",
+  pretest: "😊 Isi Emotion Meter",
+  quest: "✅ Kerjakan quest harian",
+  panic: '🤲 Tap "Astaghfirullah"',
+  muhasabah: "🌙 Muhasabah malam",
+  selesai_sesi: "🏁 Selesai sesi",
+};
+
+const HARI = [
+  "Minggu",
+  "Senin",
+  "Selasa",
+  "Rabu",
+  "Kamis",
+  "Jumat",
+  "Sabtu",
+];
+
+function tanggalLengkap(iso: string) {
+  const d = new Date(iso);
+  return `${HARI[d.getDay()]}, ${d.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  })} · ${d.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+  })} WIB`;
+}
+
+/** Ringkas perkembangan anak dari riwayat harian. */
+function analisaPerkembangan(logs: DailyLog[], s: Student) {
+  const sorted = [...logs].sort((a, b) => a.log_date.localeCompare(b.log_date));
+  const skor = sorted.map(
+    (l) => [l.sholat, l.belajar, l.sosial].filter(Boolean).length,
+  );
+  const hariAktif = sorted.length;
+  const totalQuest = skor.reduce((a, b) => a + b, 0);
+  const rata = hariAktif ? totalQuest / hariAktif : 0;
+
+  const half = Math.floor(skor.length / 2);
+  const awal = skor.slice(0, half);
+  const akhir = skor.slice(skor.length - half);
+  const avg = (arr: number[]) =>
+    arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+  const delta = half >= 1 ? avg(akhir) - avg(awal) : 0;
+
+  let status: "naik" | "stabil" | "turun" | "baru";
+  if (hariAktif < 2) status = "baru";
+  else if (delta > 0.3) status = "naik";
+  else if (delta < -0.3) status = "turun";
+  else status = "stabil";
+
+  const saran: string[] = [];
+  if (status === "baru")
+    saran.push("Data masih sedikit — dampingi anak agar rutin main tiap hari.");
+  if (status === "naik")
+    saran.push("Tren membaik. Beri apresiasi agar konsistensinya terjaga.");
+  if (status === "stabil")
+    saran.push("Progres datar. Coba beri target kecil harian yang menantang.");
+  if (status === "turun")
+    saran.push("Progres menurun. Perlu sesi konseling individual.");
+  const lemah = ["sholat", "belajar", "sosial"].filter((k) => {
+    const hit = sorted.filter((l) => (l as any)[k]).length;
+    return hariAktif > 0 && hit / hariAktif < 0.5;
+  });
+  if (lemah.length) saran.push(`Aspek yang paling sering terlewat: ${lemah.join(", ")}.`);
+  if (s.panic_taps >= 5)
+    saran.push('Sering tap "Astaghfirullah" — cek kondisi emosinya.');
+  if (s.muhasabah_count === 0)
+    saran.push("Belum pernah muhasabah malam — ingatkan refleksi harian.");
+
+  return { hariAktif, totalQuest, rata, status, saran };
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  naik: "📈 Membaik",
+  stabil: "➖ Stabil",
+  turun: "📉 Menurun",
+  baru: "🆕 Data awal",
+};
+
 export const Route = createFileRoute("/guru")({
   component: GuruDashboard,
 });
