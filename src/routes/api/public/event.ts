@@ -46,7 +46,7 @@ export const Route = createFileRoute("/api/public/event")({
         await supabaseAdmin.from("student_activity_events").insert({
           session_id: sessionId,
           event_type: type,
-          detail: (detail ?? {}) as Record<string, unknown>,
+          detail: JSON.parse(JSON.stringify(detail ?? {})),
         });
 
         await supabaseAdmin
