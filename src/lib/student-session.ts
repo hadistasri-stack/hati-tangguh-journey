@@ -140,4 +140,5 @@ export async function incrementPanicTap() {
     .maybeSingle();
   const next = (data?.panic_taps ?? 0) + 1;
   await supabase.from("student_sessions").update({ panic_taps: next }).eq("id", id);
+  void logEvent("panic", { total: next });
 }
