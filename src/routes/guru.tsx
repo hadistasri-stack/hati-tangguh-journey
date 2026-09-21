@@ -453,8 +453,62 @@ function GuruDashboard() {
                       </div>
                     </div>
 
+                    {/* Ringkasan perkembangan */}
+                    <div className="mt-3 rounded-md bg-muted/40 p-3 space-y-1">
+                      <p className="text-xs font-medium">
+                        Perkembangan: {STATUS_LABEL[analisa.status]} · aktif{" "}
+                        {analisa.hariAktif} hari · rata-rata{" "}
+                        {analisa.rata.toFixed(1)}/3 quest per hari
+                      </p>
+                      <ul className="text-xs text-muted-foreground list-disc pl-4">
+                        {analisa.saran.map((t) => (
+                          <li key={t}>{t}</li>
+                        ))}
+                      </ul>
+                      <p className="text-xs text-muted-foreground pt-1">
+                        Terakhir terlihat:{" "}
+                        {s.last_seen_at
+                          ? tanggalLengkap(s.last_seen_at)
+                          : tanggalLengkap(s.updated_at)}
+                      </p>
+                    </div>
+
+                    <div className="mt-3">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setOpenId(isOpen ? null : s.id)}
+                      >
+                        {isOpen ? "Tutup detail" : "Lihat detail & riwayat"}
+                      </Button>
+                    </div>
+
+                    {isOpen && (
+                      <div className="mt-3 space-y-1">
+                        <p className="text-xs font-medium">
+                          Riwayat aktivitas (hari, tanggal, jam)
+                        </p>
+                        {evs.length === 0 ? (
+                          <p className="text-xs text-muted-foreground">
+                            Belum ada catatan aktivitas.
+                          </p>
+                        ) : (
+                          <ul className="text-xs text-muted-foreground space-y-1 max-h-64 overflow-y-auto pr-1">
+                            {evs.map((ev) => (
+                              <li key={ev.id} className="border-b pb-1">
+                                <span className="text-foreground">
+                                  {EVENT_LABEL[ev.event_type] ?? ev.event_type}
+                                </span>{" "}
+                                — {tanggalLengkap(ev.created_at)}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    )}
+
                     {/* Daily progress table */}
-                    {hasLogs && (
+                    {hasLogs && (isOpen || hasDateFilter) && (
                       <div className="mt-4 overflow-x-auto">
                         <table className="w-full text-xs border-collapse">
                           <thead>
