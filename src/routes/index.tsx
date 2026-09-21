@@ -129,6 +129,7 @@ function ResetHati() {
               muhasabah_count: next, // approx; increments each completion
               last_muhasabah_at: new Date().toISOString(),
             });
+            void logEvent("muhasabah", { tree_level: next });
             // Ekspor otomatis snapshot harian anak ini ke file JSON.
             void exportDailySnapshot(nickname);
             setStage("dashboard");
