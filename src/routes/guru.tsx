@@ -242,7 +242,7 @@ function GuruDashboard() {
           <div>
             <h1 className="text-xl font-bold">Akses Guru BK</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Masukkan kunci akses untuk melihat data anak.
+              Masukkan kata sandi Guru BK untuk melihat data siswa.
             </p>
           </div>
           <form
@@ -256,7 +256,7 @@ function GuruDashboard() {
           >
             <Input
               type="password"
-              placeholder="Kunci akses"
+              placeholder="Kata sandi Guru BK"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               autoFocus

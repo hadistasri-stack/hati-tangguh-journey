@@ -7,9 +7,10 @@ export const Route = createFileRoute("/api/public/guru-data")({
         const url = new URL(request.url);
         const key = url.searchParams.get("key") ?? "";
         const norm = (v: string) =>
-          v.trim().toLowerCase().replace(/[\s-]+/g, " ");
+          v.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
         const accepted = [
           "game reset hati guru 2026",
+          "game reset hati guru bk 2026",
           process.env.GURU_ACCESS_KEY ?? "",
         ]
           .filter(Boolean)
