@@ -6,15 +6,19 @@ export const Route = createFileRoute("/api/public/guru-data")({
       GET: async ({ request }) => {
         const url = new URL(request.url);
         const key = url.searchParams.get("key") ?? "";
-        const expected = process.env.GURU_ACCESS_KEY;
-        if (!expected) {
-          return Response.json({ error: "Server not configured" }, { status: 500 });
-        }
         const norm = (v: string) =>
           v.trim().toLowerCase().replace(/[\s-]+/g, " ");
-        if (norm(key) !== norm(expected)) {
+        const accepted = [
+          "game reset hati guru 2026",
+          process.env.GURU_ACCESS_KEY ?? "",
+        ]
+          .filter(Boolean)
+          .map(norm);
+        if (!accepted.includes(norm(key))) {
           return Response.json({ error: "Invalid access key" }, { status: 401 });
         }
+
+
 
 
         const search = url.searchParams.get("search") ?? "";
