@@ -10,9 +10,12 @@ export const Route = createFileRoute("/api/public/guru-data")({
         if (!expected) {
           return Response.json({ error: "Server not configured" }, { status: 500 });
         }
-        if (key !== expected) {
+        const norm = (v: string) =>
+          v.trim().toLowerCase().replace(/[\s-]+/g, " ");
+        if (norm(key) !== norm(expected)) {
           return Response.json({ error: "Invalid access key" }, { status: 401 });
         }
+
 
         const search = url.searchParams.get("search") ?? "";
         const fromDate = url.searchParams.get("fromDate") ?? "";
